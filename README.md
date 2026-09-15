@@ -9,5 +9,8 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 * **Workflow Automation:** n8n Integration
 
 ## 📌 Project Structure
-* `docs/PRODUCT_CONCEPT.md` — 1-Page Product Concept & Client Scenarios
-* `docs/workflow.png` — High-Level Workflow Diagram
+* `docs/PRODUCT_CONCEPT.md` – 1-Page Product Concept & Client Scenarios
+* `docs/CLIENT_REQUIREMENT_SCHEMA.md` – Intake Form Data Schema & JSON Payload Spec
+* `docs/wireframe.html` – Interactive HTML Web Form Wireframe
+* `docs/wireframe.png` – Wireframe Interface Screenshot
+* `docs/workflow.png` – High-Level Workflow Diagram
