@@ -1,0 +1,317 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #0B0E14;
+    color: #E2E8F0;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.container {
+    background: #111622;
+    max-width: 760px;
+    width: 100%;
+    padding: 36px;
+    border-radius: 12px;
+    border: 1px solid #1E2638;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #60A5FA;
+    background: rgba(30, 58, 138, 0.3);
+    border: 1px solid #1E40AF;
+    border-radius: 16px;
+    padding: 4px 12px;
+    margin-bottom: 12px;
+}
+
+h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    color: #94A3B8;
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+fieldset {
+    border: none;
+    margin-bottom: 32px;
+}
+
+legend {
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-number {
+    background: #1E293B;
+    color: #60A5FA;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #CBD5E1;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: #F87171;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 14px;
+    background-color: #171E2E;
+    border: 1px solid #26334D;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]::placeholder,
+textarea::placeholder {
+    color: #475569;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #3B82F6;
+}
+
+/* Custom Visible Select Dropdown Arrow */
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.select-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #60A5FA;
+    /* Blue custom visible dropdown arrow */
+    pointer-events: none;
+}
+
+/* Button & Card Selection Styling */
+.radio-grid,
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.checkbox-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.radio-card,
+.checkbox-card {
+    position: relative;
+    background-color: #171E2E;
+    border: 1px solid #26334D;
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Checkbox Cards with Visible Tick Boxes */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.checkbox-card {
+    position: relative;
+    background-color: #171E2E;
+    border: 1px solid #26334D;
+    border-radius: 6px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.checkbox-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Square Tick Box Frame */
+.checkbox-box {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 2px solid #475569;
+    border-radius: 4px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.card-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #94A3B8;
+    transition: color 0.2s ease;
+}
+
+/* Checked State: Turn Box Blue & Render Checkmark */
+.checkbox-card input:checked~.checkbox-box {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.checkbox-card input:checked~.checkbox-box::after {
+    content: "✓";
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Card Active Highlight */
+.checkbox-card:has(input:checked) {
+    background-color: #1E293B;
+    border-color: #3B82F6;
+}
+
+.checkbox-card:has(input:checked) .card-label {
+    color: #FFFFFF;
+}
+
+/* Subtle Dark-Mode Error Highlight */
+.input-error {
+    border: 1px solid #EF4444 !important;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Alert Banner */
+.status-banner {
+    display: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.status-banner.success {
+    display: block;
+    background-color: #059669;
+    color: #FFFFFF;
+}
+
+.status-banner.error {
+    display: block;
+    background-color: #DC2626;
+    color: #FFFFFF;
+}
+
+/* Glowing Submit Button */
+button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #6366F1 0%, #3B82F6 100%);
+    color: #FFFFFF;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+button[type="submit"]:hover {
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    transform: translateY(-1px);
+}
+
+/* Responsive Mobile Layout */
+@media (max-width: 640px) {
+
+    .form-row,
+    .checkbox-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .radio-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
