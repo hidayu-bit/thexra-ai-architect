@@ -87,7 +87,8 @@ legend {
     margin-bottom: 20px;
 }
 
-label {
+label,
+.group-label {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -148,24 +149,17 @@ select:focus {
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 6px solid #60A5FA;
-    /* Blue custom visible dropdown arrow */
     pointer-events: none;
 }
 
-/* Button & Card Selection Styling */
-.radio-grid,
-.checkbox-grid {
+/* Radio Grid & Custom Cards */
+.radio-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 
-.checkbox-grid {
-    grid-template-columns: 1fr 1fr;
-}
-
-.radio-card,
-.checkbox-card {
+.radio-card {
     position: relative;
     background-color: #171E2E;
     border: 1px solid #26334D;
@@ -174,14 +168,47 @@ select:focus {
     text-align: center;
     cursor: pointer;
     user-select: none;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
 }
 
-/* Checkbox Cards with Visible Tick Boxes */
+.radio-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* White Radio Circle Dot */
+.radio-dot {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+/* Selected Radio Dot Highlight */
+.radio-card input[type="radio"]:checked+.radio-dot {
+    background-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.radio-card:has(input[type="radio"]:checked) {
+    background-color: #1E293B;
+    border-color: #3B82F6;
+}
+
+.radio-card:has(input[type="radio"]:checked) .card-label {
+    color: #FFFFFF;
+}
+
+/* Checkbox Cards */
 .checkbox-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -210,7 +237,6 @@ select:focus {
     width: 0;
 }
 
-/* Square Tick Box Frame */
 .checkbox-box {
     width: 18px;
     height: 18px;
@@ -231,7 +257,6 @@ select:focus {
     transition: color 0.2s ease;
 }
 
-/* Checked State: Turn Box Blue & Render Checkmark */
 .checkbox-card input:checked~.checkbox-box {
     background-color: #3B82F6;
     border-color: #3B82F6;
@@ -244,7 +269,6 @@ select:focus {
     font-weight: bold;
 }
 
-/* Card Active Highlight */
 .checkbox-card:has(input:checked) {
     background-color: #1E293B;
     border-color: #3B82F6;
@@ -254,7 +278,7 @@ select:focus {
     color: #FFFFFF;
 }
 
-/* Subtle Dark-Mode Error Highlight */
+/* Dark-Mode Red Error Highlight */
 .input-error {
     border: 1px solid #EF4444 !important;
     box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4) !important;
@@ -301,6 +325,11 @@ button[type="submit"] {
 button[type="submit"]:hover {
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
     transform: translateY(-1px);
+}
+
+button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Responsive Mobile Layout */

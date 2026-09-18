@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Solution Architect Intake</title>
     <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+  {
+    "imports": {
+      "@google/genai": "https://esm.run/@google/genai"
+    }
+  }
+</script>
+    <script type="module" src="script.js" defer></script>
 </head>
 
 <body>
@@ -52,19 +60,23 @@
                     <div class="radio-grid">
                         <label class="radio-card">
                             <input type="radio" name="scale" value="1-50" required>
-                            <span>1 - 50</span>
+                            <span class="radio-dot"></span>
+                            <span class="card-label">1 - 50</span>
                         </label>
                         <label class="radio-card">
                             <input type="radio" name="scale" value="51-250">
-                            <span>51 - 250</span>
+                            <span class="radio-dot"></span>
+                            <span class="card-label">51 - 250</span>
                         </label>
                         <label class="radio-card">
                             <input type="radio" name="scale" value="251-1000">
-                            <span>251 - 1,000</span>
+                            <span class="radio-dot"></span>
+                            <span class="card-label">251 - 1,000</span>
                         </label>
                         <label class="radio-card">
                             <input type="radio" name="scale" value="1000+">
-                            <span>1,000+</span>
+                            <span class="radio-dot"></span>
+                            <span class="card-label">1,000+</span>
                         </label>
                     </div>
                 </div>
@@ -168,9 +180,11 @@
 
             <button type="submit" id="submit-btn">Submit for AI Scoping &rarr;</button>
         </form>
+
+        <div id="aiOutput"
+            style="white-space: pre-wrap; margin-top: 24px; color: #E2E8F0; font-size: 14px; line-height: 1.6;"></div>
     </div>
 
-    <script src="script.js"></script>
 </body>
 
 </html>
