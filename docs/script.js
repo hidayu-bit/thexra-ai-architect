@@ -49,7 +49,7 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 3) {
             if (err.message && err.message.includes('503') && i < maxRetries - 1) {
                 console.warn(`503 High Demand on gemini-3.6-flash. Retrying in ${delay / 1000}s... (Attempt ${i + 1}/${maxRetries})`);
                 await new Promise((resolve) => setTimeout(resolve, delay));
-                delay *= 1.5; // Exponential backoff delay multiplier
+                delay *= 1.5; // Exponential backoff multiplier
             } else {
                 throw err;
             }
@@ -59,11 +59,81 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 3) {
 
 // 4. Attach Event Listener to Intake Form
 intakeForm?.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Prevent full page refresh
+    e.preventDefault(); // Prevent page reload
+
+    let hasError = false;
+
+    // 1. Standard text inputs, textareas, and select dropdowns
+    const requiredFields = intakeForm.querySelectorAll('input[required]:not([type="radio"]):not([type="checkbox"]), textarea[required], select[required]');
+
+    requiredFields.forEach((field) => {
+        const val = field.value.trim();
+        const isEmpty = !val || (field.tagName === 'SELECT' && val.toLowerCase().startsWith('select'));
+
+        if (isEmpty) {
+            field.classList.add('input-error');
+            hasError = true;
+
+            const eventType = field.tagName === 'SELECT' ? 'change' : 'input';
+            field.addEventListener(eventType, () => {
+                const updatedVal = field.value.trim();
+                const stillEmpty = !updatedVal || (field.tagName === 'SELECT' && updatedVal.toLowerCase().startsWith('select'));
+                if (!stillEmpty) {
+                    field.classList.remove('input-error');
+                }
+            }, { once: true });
+        } else {
+            field.classList.remove('input-error');
+        }
+    });
+
+    // 2. Target User Count (Radio Buttons) - Highlight visible option cards
+    const radioGroups = new Set();
+    intakeForm.querySelectorAll('input[type="radio"][required]').forEach(radio => radioGroups.add(radio.name));
+
+    radioGroups.forEach((groupName) => {
+        const groupRadios = intakeForm.querySelectorAll(`input[name="${groupName}"]`);
+        const isChecked = Array.from(groupRadios).some(radio => radio.checked);
+
+        groupRadios.forEach(radio => {
+            // Target the visible parent box/label wrapping the radio input
+            const boxContainer = radio.closest('label') || radio.parentElement;
+
+            if (!isChecked) {
+                hasError = true;
+                boxContainer?.classList.add('input-error');
+
+                // Remove red border from all boxes in the group as soon as one is clicked
+                radio.addEventListener('change', () => {
+                    groupRadios.forEach(r => {
+                        const parentBox = r.closest('label') || r.parentElement;
+                        parentBox?.classList.remove('input-error');
+                    });
+                }, { once: true });
+            } else {
+                boxContainer?.classList.remove('input-error');
+            }
+        });
+    });
+
+    // 🛑 Stop submission if any required input is empty
+    if (hasError) {
+        if (statusBanner) {
+            statusBanner.className = 'status-banner error';
+            statusBanner.innerText = 'Please fill up all required fields before submitting.';
+        }
+        statusBanner?.scrollIntoView({ behavior: 'smooth' });
+        return; // Do NOT call Gemini API
+    }
+
+    // --- READ VALUES AFTER VALIDATION ---
+    const companyName = document.getElementById('companyName')?.value.trim();
+    const industry = document.getElementById('industry')?.value.trim();
+    const problem = document.getElementById('problem')?.value.trim();
 
     const submitBtn = intakeForm.querySelector('button[type="submit"]');
 
-    // Display Loading State immediately
+    // Display Loading State
     if (statusBanner) {
         statusBanner.className = 'status-banner loading';
         statusBanner.innerText = 'Sending client data to Gemini...';
@@ -74,35 +144,24 @@ intakeForm?.addEventListener('submit', async (e) => {
         submitBtn.innerText = 'Generating Brief...';
     }
 
-    // Force browser repaint to show blue loading state instantly
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // Read form input values
-    const companyName = document.getElementById('companyName')?.value || 'N/A';
-    const industry = document.getElementById('industry')?.value || 'N/A';
-    const problem = document.getElementById('problem')?.value || 'N/A';
-
-    // Construct prompt for Gemini
     const systemPrompt = `You are an Enterprise AI Architect. Analyze the following client submission and populate all structured JSON fields according to the required schema:
     - Company Name: ${companyName}
     - Industry: ${industry}
     - Core Problem: ${problem}`;
 
     try {
-        // Step A: Make API call with retry wrapper
         const response = await callGeminiWithRetry(systemPrompt);
-
-        // Step B: Parse JSON text output
         const data = JSON.parse(response.text);
 
-        // Step C: Update Status Banner to Green Success
         if (statusBanner) {
             statusBanner.className = 'status-banner success';
             statusBanner.innerText = 'AI Response received successfully!';
         }
 
-        // Step D: Render 8 structured fields into the HTML container
         if (briefOutput) {
+            briefOutput.className = '';
             briefOutput.innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left; padding: 1rem;">
                     <div><strong>Business Problem:</strong> ${data.businessProblem}</div>
@@ -117,7 +176,6 @@ intakeForm?.addEventListener('submit', async (e) => {
             `;
         }
 
-        // Step E: Smooth scroll to status banner so green message & brief render together
         statusBanner?.scrollIntoView({ behavior: 'smooth' });
 
     } catch (err) {
@@ -127,7 +185,6 @@ intakeForm?.addEventListener('submit', async (e) => {
             statusBanner.innerText = err.message || 'API Error: Failed to generate response.';
         }
     } finally {
-        // Re-enable submit button
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerText = 'Submit for AI Scoping →';

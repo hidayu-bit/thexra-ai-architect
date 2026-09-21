@@ -371,3 +371,9 @@ html {
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
 }
+
+/* Thin red border for invalid inputs */
+.input-error {
+    border: 1px solid #ef4444 !important;
+    outline: none !important;
+}
