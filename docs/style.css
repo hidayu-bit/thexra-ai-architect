@@ -295,16 +295,25 @@ select:focus {
     margin-bottom: 20px;
 }
 
+.status-banner.loading {
+    display: block !important;
+    background-color: #2563eb !important;
+    /* Blue background */
+    color: #ffffff !important;
+}
+
 .status-banner.success {
-    display: block;
-    background-color: #059669;
-    color: #FFFFFF;
+    display: block !important;
+    background-color: #059669 !important;
+    /* Emerald green background */
+    color: #ffffff !important;
 }
 
 .status-banner.error {
-    display: block;
-    background-color: #DC2626;
-    color: #FFFFFF;
+    display: block !important;
+    background-color: #dc2626 !important;
+    /* Red background */
+    color: #ffffff !important;
 }
 
 /* Glowing Submit Button */
@@ -343,4 +352,22 @@ button[type="submit"]:disabled {
     .radio-grid {
         grid-template-columns: 1fr 1fr;
     }
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Style and format the raw Gemini output */
+#aiOutput {
+    white-space: pre-wrap;
+    /* Keeps line breaks and spaces organized */
+    line-height: 1.6;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
 }
