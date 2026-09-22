@@ -16,6 +16,13 @@
                 "Hardware costs",
                 "Limited battery life",
                 "Sensitive to bright sunlight"
+            ],
+            "recommendedProducts": [
+                "THEXRA Remote",
+                "THEXRA Make",
+                "THEXRA View",
+                "HTC VIVE Eagle",
+                "RealWear Navigator 520"
             ]
         },
         {
@@ -34,7 +41,8 @@
                 "Causes motion sickness for some users",
                 "Isolates user from physical environment",
                 "Requires dedicated space"
-            ]
+            ],
+            "recommendedProducts": []
         },
         {
             "name": "MR",
@@ -52,6 +60,10 @@
                 "High headset costs",
                 "Heavier hardware",
                 "Complex development pipeline"
+            ],
+            "recommendedProducts": [
+                "Microsoft HoloLens 2",
+                "VIRNECT XR Suite"
             ]
         },
         {
@@ -70,6 +82,10 @@
                 "Requires quality training data",
                 "Model hallucination risks",
                 "High compute costs"
+            ],
+            "recommendedProducts": [
+                "Edge AI Safety Modules",
+                "AGIBOT (Embodied AI / Humanoid Integration)"
             ]
         },
         {
@@ -88,6 +104,9 @@
                 "High initial setup complexity",
                 "Requires constant IoT sensor integration",
                 "Large data bandwidth needed"
+            ],
+            "recommendedProducts": [
+                "VIRNECT Digital Twin Platform"
             ]
         },
         {
@@ -106,6 +125,9 @@
                 "Expensive custom hardware build",
                 "Large footprint required",
                 "Specific to single use case"
+            ],
+            "recommendedProducts": [
+                "MECHALABO Heavy-Industry Training Simulators"
             ]
         },
         {
@@ -124,7 +146,8 @@
                 "No personalized immersion",
                 "Fixed physical location",
                 "Prone to wear and tear"
-            ]
+            ],
+            "recommendedProducts": []
         },
         {
             "name": "Location-Based Experience",
@@ -142,7 +165,8 @@
                 "High venue maintenance",
                 "Geographically restricted",
                 "Requires physical setup"
-            ]
+            ],
+            "recommendedProducts": []
         },
         {
             "name": "Mobile/Web",
@@ -160,7 +184,8 @@
                 "Smaller screen size",
                 "Lower 3D rendering performance",
                 "No true 3D immersion"
-            ]
+            ],
+            "recommendedProducts": []
         },
         {
             "name": "Combination solution",
@@ -176,6 +201,13 @@
                 "Highest budget requirement",
                 "Longer development timeline",
                 "Requires multi-team coordination"
+            ],
+            "recommendedProducts": [
+                "THEXRA Suite (Remote, Make, View)",
+                "AGIBOT",
+                "HTC VIVE Eagle",
+                "VIRNECT XR Suite",
+                "MECHALABO"
             ]
         }
     ]

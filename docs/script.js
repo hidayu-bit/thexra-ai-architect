@@ -167,10 +167,13 @@ intakeForm?.addEventListener('submit', async (e) => {
     - Industry: ${industry}
     - Core Problem: ${problem}
     
-    CRITICAL INSTRUCTION:
-    You MUST select the "recommendedTechnology" strictly from THEXRA's official technology knowledge base provided below. Match the client's problem against the defined use cases, advantages, and limitations in this dataset:${knowledgeContext}
-    
-    If you select "Combination solution", you MUST specify the technologies being combined in the "recommendedTechnology" field (e.g., "Combination solution (AI + AR)") and explain how they work together in the Solution Concept.`;
+   CRITICAL INSTRUCTION:
+1. You MUST select the "recommendedTechnology" strictly from THEXRA's official technology knowledge base provided below:
+${knowledgeContext}
+
+2. If you select "Combination solution", you MUST specify the technologies being combined in the "recommendedTechnology" field (e.g., "Combination solution (AI + AR)") and explain how they work together in the Solution Concept.
+
+3. In the "Solution Concept", explicitly incorporate and recommend the products listed under the "recommendedProducts" array for the chosen technology in the knowledge base.`;
 
     try {
         const response = await callGeminiWithRetry(systemPrompt);
