@@ -1,0 +1,182 @@
+{
+    "categories": [
+        {
+            "name": "AR",
+            "use_cases": [
+                "Field service maintenance",
+                "Remote expert assistance",
+                "On-site assembly guidance"
+            ],
+            "advantages": [
+                "Overlays digital info on real world",
+                "Hands-free operation with smart glasses",
+                "Reduces human error on site"
+            ],
+            "limitations": [
+                "Hardware costs",
+                "Limited battery life",
+                "Sensitive to bright sunlight"
+            ]
+        },
+        {
+            "name": "VR",
+            "use_cases": [
+                "Hazardous environment training",
+                "Surgical simulation",
+                "Virtual showroom"
+            ],
+            "advantages": [
+                "Fully immersive environment",
+                "Safe space for high-risk training",
+                "High engagement and retention"
+            ],
+            "limitations": [
+                "Causes motion sickness for some users",
+                "Isolates user from physical environment",
+                "Requires dedicated space"
+            ]
+        },
+        {
+            "name": "MR",
+            "use_cases": [
+                "3D CAD model review",
+                "Interactive surgical planning",
+                "Complex architectural design"
+            ],
+            "advantages": [
+                "Blends physical and digital interaction",
+                "Supports multi-user collaboration",
+                "Highly accurate spatial anchor"
+            ],
+            "limitations": [
+                "High headset costs",
+                "Heavier hardware",
+                "Complex development pipeline"
+            ]
+        },
+        {
+            "name": "AI",
+            "use_cases": [
+                "Predictive maintenance",
+                "Automated visual quality control",
+                "Conversational assistant"
+            ],
+            "advantages": [
+                "Processes large data instantly",
+                "Reduces operational downtime",
+                "24/7 automated decision making"
+            ],
+            "limitations": [
+                "Requires quality training data",
+                "Model hallucination risks",
+                "High compute costs"
+            ]
+        },
+        {
+            "name": "Digital Twin",
+            "use_cases": [
+                "Factory floor monitoring",
+                "Smart building management",
+                "Asset lifecycle tracking"
+            ],
+            "advantages": [
+                "Real-time asset visibility",
+                "Simulates future failure scenarios",
+                "Optimizes energy and performance"
+            ],
+            "limitations": [
+                "High initial setup complexity",
+                "Requires constant IoT sensor integration",
+                "Large data bandwidth needed"
+            ]
+        },
+        {
+            "name": "Simulator",
+            "use_cases": [
+                "Flight training",
+                "Heavy machinery operation",
+                "Vehicle driving test"
+            ],
+            "advantages": [
+                "Replicates physical physics accurately",
+                "Practice without equipment damage",
+                "Detailed performance telemetry"
+            ],
+            "limitations": [
+                "Expensive custom hardware build",
+                "Large footprint required",
+                "Specific to single use case"
+            ]
+        },
+        {
+            "name": "Interactive Display",
+            "use_cases": [
+                "Trade show exhibit",
+                "Public kiosk",
+                "Interactive boardroom dashboard"
+            ],
+            "advantages": [
+                "Easy for general public to use",
+                "Supports touch or gesture control",
+                "Durable hardware"
+            ],
+            "limitations": [
+                "No personalized immersion",
+                "Fixed physical location",
+                "Prone to wear and tear"
+            ]
+        },
+        {
+            "name": "Location-Based Experience",
+            "use_cases": [
+                "Theme park attraction",
+                "Museum tour guide",
+                "Large warehouse navigation"
+            ],
+            "advantages": [
+                "Provides context to specific location",
+                "Engages large visitor groups",
+                "Unique physical-digital setup"
+            ],
+            "limitations": [
+                "High venue maintenance",
+                "Geographically restricted",
+                "Requires physical setup"
+            ]
+        },
+        {
+            "name": "Mobile/Web",
+            "use_cases": [
+                "E-commerce product preview",
+                "Client intake forms",
+                "Cross-platform dashboard"
+            ],
+            "advantages": [
+                "Accessible on any device",
+                "Zero installation needed for web",
+                "Cost-effective distribution"
+            ],
+            "limitations": [
+                "Smaller screen size",
+                "Lower 3D rendering performance",
+                "No true 3D immersion"
+            ]
+        },
+        {
+            "name": "Combination solution",
+            "use_cases": [
+                "AI-driven VR training platform",
+                "IoT Digital Twin with AR headset overlay"
+            ],
+            "advantages": [
+                "Solves complex multi-step enterprise problems",
+                "Maximum operational impact"
+            ],
+            "limitations": [
+                "Highest budget requirement",
+                "Longer development timeline",
+                "Requires multi-team coordination"
+            ]
+        }
+    ]
+}

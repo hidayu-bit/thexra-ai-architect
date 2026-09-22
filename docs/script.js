@@ -1,3 +1,16 @@
+let techKnowledge = null;
+
+// Load the THEXRA technology knowledge base
+fetch('./technology_knowledge.json')
+    .then(response => response.json())
+    .then(data => {
+        techKnowledge = data;
+        console.log("THEXRA technology knowledge base loaded:", techKnowledge);
+    })
+    .catch(error => {
+        console.error("Error loading technology_knowledge.json:", error);
+    });
+
 import { GoogleGenAI } from '@google/genai';
 
 // 1. Initialize Gemini API Client
@@ -146,10 +159,18 @@ intakeForm?.addEventListener('submit', async (e) => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const systemPrompt = `You are an Enterprise AI Architect. Analyze the following client submission and populate all structured JSON fields according to the required schema:
+    // Make sure techKnowledge is available before making the call
+    const knowledgeContext = techKnowledge ? JSON.stringify(techKnowledge) : "";
+
+    const systemPrompt = `You are an Enterprise AI Architect for THEXRA. Analyze the following client submission and populate all structured JSON fields according to the required schema:
     - Company Name: ${companyName}
     - Industry: ${industry}
-    - Core Problem: ${problem}`;
+    - Core Problem: ${problem}
+    
+    CRITICAL INSTRUCTION:
+    You MUST select the "recommendedTechnology" strictly from THEXRA's official technology knowledge base provided below. Match the client's problem against the defined use cases, advantages, and limitations in this dataset:${knowledgeContext}
+    
+    If you select "Combination solution", you MUST specify the technologies being combined in the "recommendedTechnology" field (e.g., "Combination solution (AI + AR)") and explain how they work together in the Solution Concept.`;
 
     try {
         const response = await callGeminiWithRetry(systemPrompt);
@@ -161,17 +182,17 @@ intakeForm?.addEventListener('submit', async (e) => {
         }
 
         if (briefOutput) {
-            briefOutput.className = '';
+            briefOutput.className = 'glass-panel active';
             briefOutput.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left; padding: 1rem;">
-                    <div><strong>Business Problem:</strong> ${data.businessProblem}</div>
-                    <div><strong>Client Objective:</strong> ${data.clientObjective}</div>
-                    <div><strong>Recommended Technology:</strong> ${data.recommendedTechnology}</div>
-                    <div><strong>Solution Concept:</strong> ${data.solutionConcept}</div>
-                    <div><strong>Target Users:</strong> ${data.targetUsers}</div>
-                    <div><strong>Expected Benefits:</strong> ${data.expectedBenefits}</div>
-                    <div><strong>Complexity:</strong> ${data.complexity}</div>
-                    <div><strong>Recommended Next Step:</strong> ${data.recommendedNextStep}</div>
+                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
+                    <div><strong style="color: #60A5FA;">Business Problem:</strong> ${data.businessProblem}</div>
+                    <div><strong style="color: #60A5FA;">Client Objective:</strong> ${data.clientObjective}</div>
+                    <div><strong style="color: #60A5FA;">Recommended Technology:</strong> ${data.recommendedTechnology}</div>
+                    <div><strong style="color: #60A5FA;">Solution Concept:</strong> ${data.solutionConcept}</div>
+                    <div><strong style="color: #60A5FA;">Target Users:</strong> ${data.targetUsers}</div>
+                    <div><strong style="color: #60A5FA;">Expected Benefits:</strong> ${data.expectedBenefits}</div>
+                    <div><strong style="color: #60A5FA;">Complexity:</strong> ${data.complexity}</div>
+                    <div><strong style="color: #60A5FA;">Recommended Next Step:</strong> ${data.recommendedNextStep}</div>
                 </div>
             `;
         }

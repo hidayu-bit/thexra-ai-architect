@@ -377,3 +377,21 @@ html {
     border: 1px solid #ef4444 !important;
     outline: none !important;
 }
+
+/* Glassmorphism Styling — Applied ONLY to the AI Output Brief */
+#aiOutput.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 1.5rem;
+    margin-top: 24px;
+    transition: all 0.3s ease-in-out;
+}
+
+#aiOutput.glass-panel.active {
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
