@@ -1,0 +1,164 @@
+{
+    "industries": [
+        {
+            "name": "Manufacturing",
+            "problems": [
+                "High machine downtime during reactive repairs",
+                "Slow onboarding and high human error for assembly line technicians",
+                "Costly physical prototyping during hardware design cycles",
+                "Inefficient quality control and visual inspection tracking",
+                "Lack of real-time operational visibility across factory floors"
+            ],
+            "suitableTechnologies": [
+                "AR",
+                "Digital Twin",
+                "AI",
+                "MR"
+            ]
+        },
+        {
+            "name": "Education",
+            "problems": [
+                "Low student engagement in traditional lecture environments",
+                "High cost and physical space constraints for specialized lab equipment",
+                "Inability to safely conduct hazardous science or engineering experiments",
+                "Limited access to interactive 3D spatial learning materials",
+                "Difficulty assessing practical hands-free skill mastery remotely"
+            ],
+            "suitableTechnologies": [
+                "VR",
+                "Mobile/Web",
+                "Interactive Display",
+                "MR"
+            ]
+        },
+        {
+            "name": "Healthcare",
+            "problems": [
+                "High risk during complex surgical procedures for junior medical staff",
+                "High cost of physical medical simulation equipment and mannequins",
+                "Patient anxiety due to poor visual explanation of treatment plans",
+                "Limited access to real-time specialist guidance in remote clinics",
+                "Inability to visualize complex 3D patient organ scans prior to surgery"
+            ],
+            "suitableTechnologies": [
+                "MR",
+                "VR",
+                "AR",
+                "AI"
+            ]
+        },
+        {
+            "name": "Tourism",
+            "problems": [
+                "Seasonal fluctuations causing severe revenue loss in off-peak months",
+                "Lack of interactive storytelling at historical and heritage sites",
+                "Inability to showcase destination experiences to remote prospects",
+                "Overcrowding and physical degradation of delicate tourist landmarks",
+                "Poor navigation and wayfinding in large outdoor venues or resorts"
+            ],
+            "suitableTechnologies": [
+                "Location-Based Experience",
+                "VR",
+                "AR",
+                "Mobile/Web"
+            ]
+        },
+        {
+            "name": "Retail",
+            "problems": [
+                "High product return rates due to incorrect customer size or fit expectations",
+                "Low foot traffic and customer engagement in physical stores",
+                "High operational cost of maintaining large physical showroom inventory",
+                "Lack of personalized product customization during the shopping journey",
+                "Inefficient store layout optimization and planogram testing"
+            ],
+            "suitableTechnologies": [
+                "AR",
+                "Mobile/Web",
+                "Interactive Display",
+                "AI"
+            ]
+        },
+        {
+            "name": "Property",
+            "problems": [
+                "Long sales cycles waiting for off-plan real estate construction to complete",
+                "High travel costs for international buyers inspecting properties",
+                "Difficulty helping buyers visualize unbuilt architectural designs",
+                "High cost of staging physical model homes and units",
+                "Inefficient facility tracking and smart builiding maintenance after handover"
+            ],
+            "suitableTechnologies": [
+                "Digital Twin",
+                "VR",
+                "MR",
+                "Mobile/Web"
+            ]
+        },
+        {
+            "name": "Energy",
+            "problems": [
+                "High safety hazards and risks during offshore or high-voltage maintenance",
+                "Travel delay sending senior experts to remote oil rigs or solar farms",
+                "Difficulty simulating critical emergency shutdown scenarios safely",
+                "Unplanned asset failure due to lack of predictive monitoring",
+                "Complex compliance auditing across geographically dispersed sites"
+            ],
+            "suitableTechnologies": [
+                "AR",
+                "Digital Twin",
+                "Simulator",
+                "AI"
+            ]
+        },
+        {
+            "name": "Government",
+            "problems": [
+                "High expense training public safety officers for crisis response",
+                "Low public engagement in urban planning visual reviews",
+                "Inefficient infrastucture maintenance across municipal assets",
+                "Complex compliance tracking across public works projects",
+                "Slow onboarding for specialized defense and civil operations"
+            ],
+            "suitableTechnologies": [
+                "Simulator",
+                "Digital Twin",
+                "Interactive Display",
+                "VR"
+            ]
+        },
+        {
+            "name": "Training",
+            "problems": [
+                "High equipment wear and tear during heavy machinery operator training",
+                "Prohibitive costs of traveling staff to central physical training facilities",
+                "Inability to safely replicate rare high-risk operational failures",
+                "Inconsistent training evaluation across different regional branches",
+                "Low retention rates from conventional paper-based training modules"
+            ],
+            "suitableTechnologies": [
+                "Simulator",
+                "VR",
+                "AR",
+                "Combination solution"
+            ]
+        },
+        {
+            "name": "Entertainment",
+            "problems": [
+                "High customer churn demanding novel interactive digital experiences",
+                "Limited physical floor space for expanding venue attractions",
+                "High production costs for physical set builds and dynamic props",
+                "Inability to monetize live events beyond physical venue capacity",
+                "Difficulty personalizing guest interactions at scale"
+            ],
+            "suitableTechnologies": [
+                "Location-Based Experience",
+                "VR",
+                "Interactive Display",
+                "MR"
+            ]
+        }
+    ]
+}

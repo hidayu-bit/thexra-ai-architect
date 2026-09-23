@@ -1,15 +1,26 @@
-let techKnowledge = null;
+// Global variables to store our grounded knowledge bases
+let techKnowledge = {};
+let industryKnowledge = {};
 
-// Load the THEXRA technology knowledge base
-fetch('./technology_knowledge.json')
-    .then(response => response.json())
-    .then(data => {
-        techKnowledge = data;
-        console.log("THEXRA technology knowledge base loaded:", techKnowledge);
-    })
-    .catch(error => {
-        console.error("Error loading technology_knowledge.json:", error);
-    });
+// Asynchronously load both JSON knowledge bases
+async function loadKnowledgeBases() {
+    try {
+        const [techRes, industryRes] = await Promise.all([
+            fetch('technology_knowledge.json'),
+            fetch('industry_knowledge.json')
+        ]);
+
+        techKnowledge = await techRes.json();
+        industryKnowledge = await industryRes.json();
+
+        console.log("Both Knowledge Bases loaded successfully!");
+    } catch (error) {
+        console.error("Error loading knowledge bases:", error);
+    }
+}
+
+// Call the function when script loads
+loadKnowledgeBases();
 
 import { GoogleGenAI } from '@google/genai';
 
@@ -159,21 +170,26 @@ intakeForm?.addEventListener('submit', async (e) => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // Make sure techKnowledge is available before making the call
-    const knowledgeContext = techKnowledge ? JSON.stringify(techKnowledge) : "";
+    // Build knowledge contexts for both technology and industry
+    // Build knowledge contexts for both technology and industry
+    const techContext = techKnowledge ? JSON.stringify(techKnowledge) : "";
+    const industryContext = industryKnowledge ? JSON.stringify(industryKnowledge) : "";
 
     const systemPrompt = `You are an Enterprise AI Architect for THEXRA. Analyze the following client submission and populate all structured JSON fields according to the required schema:
-    - Company Name: ${companyName}
-    - Industry: ${industry}
-    - Core Problem: ${problem}
-    
-   CRITICAL INSTRUCTION:
-1. You MUST select the "recommendedTechnology" strictly from THEXRA's official technology knowledge base provided below:
-${knowledgeContext}
+- Company Name: ${companyName}
+- Industry: ${industry}
+- Core Problem: ${problem}
 
-2. If you select "Combination solution", you MUST specify the technologies being combined in the "recommendedTechnology" field (e.g., "Combination solution (AI + AR)") and explain how they work together in the Solution Concept.
+CRITICAL INSTRUCTION:
+1. You MUST cross-reference the client's industry and problem against THEXRA's official Industry Knowledge Base:
+${industryContext}
 
-3. In the "Solution Concept", explicitly incorporate and recommend the products listed under the "recommendedProducts" array for the chosen technology in the knowledge base.`;
+2. You MUST select the "recommendedTechnology" strictly from THEXRA's official technology knowledge base provided below:
+${techContext}
+
+3. If you select "Combination solution", you MUST specify the technologies being combined in the "recommendedTechnology" field (e.g., "Combination solution (AI + AR)") and explain how they work together in the Solution Concept.
+
+4. In the "Solution Concept", explicitly incorporate and recommend the products listed under the "recommendedProducts" array for the chosen technology in the knowledge base.`;
 
     try {
         const response = await callGeminiWithRetry(systemPrompt);
