@@ -2,7 +2,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -10,13 +11,15 @@ body {
     color: #E2E8F0;
     display: flex;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 30px 20px;
+    min-height: 100vh;
 }
 
+/* Expanded Main Container for Widescreen Laptops */
 .container {
     background: #111622;
-    max-width: 760px;
-    width: 100%;
+    max-width: 1200px !important;
+    width: 95% !important;
     padding: 36px;
     border-radius: 12px;
     border: 1px solid #1E2638;
@@ -125,7 +128,7 @@ select:focus {
     border-color: #3B82F6;
 }
 
-/* Custom Visible Select Dropdown Arrow */
+/* Custom Select Dropdown Arrow */
 .select-wrapper {
     position: relative;
 }
@@ -152,7 +155,7 @@ select:focus {
     pointer-events: none;
 }
 
-/* Radio Grid & Custom Cards */
+/* Radio Grid & Cards */
 .radio-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -182,7 +185,6 @@ select:focus {
     height: 0;
 }
 
-/* White Radio Circle Dot */
 .radio-dot {
     width: 14px;
     height: 14px;
@@ -193,7 +195,6 @@ select:focus {
     transition: all 0.2s ease;
 }
 
-/* Selected Radio Dot Highlight */
 .radio-card input[type="radio"]:checked+.radio-dot {
     background-color: #3B82F6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
@@ -278,13 +279,13 @@ select:focus {
     color: #FFFFFF;
 }
 
-/* Dark-Mode Red Error Highlight */
+/* Red Error Highlight */
 .input-error {
     border: 1px solid #EF4444 !important;
     box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4) !important;
 }
 
-/* Alert Banner */
+/* Status Alert Banner */
 .status-banner {
     display: none;
     padding: 14px;
@@ -298,25 +299,22 @@ select:focus {
 .status-banner.loading {
     display: block !important;
     background-color: #2563eb !important;
-    /* Blue background */
     color: #ffffff !important;
 }
 
 .status-banner.success {
     display: block !important;
     background-color: #059669 !important;
-    /* Emerald green background */
     color: #ffffff !important;
 }
 
 .status-banner.error {
     display: block !important;
     background-color: #dc2626 !important;
-    /* Red background */
     color: #ffffff !important;
 }
 
-/* Glowing Submit Button */
+/* Submit Button */
 button[type="submit"] {
     width: 100%;
     padding: 14px;
@@ -341,49 +339,22 @@ button[type="submit"]:disabled {
     cursor: not-allowed;
 }
 
-/* Responsive Mobile Layout */
-@media (max-width: 640px) {
-
-    .form-row,
-    .checkbox-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .radio-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-/* Smooth scrolling for the whole page */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Style and format the raw Gemini output */
+/* Output Wrapper */
 #aiOutput {
     white-space: pre-wrap;
-    /* Keeps line breaks and spaces organized */
     line-height: 1.6;
     font-size: 0.95rem;
     color: #e2e8f0;
     margin-top: 1rem;
     padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    width: 100% !important;
 }
 
-/* Thin red border for invalid inputs */
-.input-error {
-    border: 1px solid #ef4444 !important;
-    outline: none !important;
-}
-
-/* Glassmorphism Styling — Applied ONLY to the AI Output Brief */
 #aiOutput.glass-panel {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     padding: 1.5rem;
@@ -394,4 +365,68 @@ html {
 #aiOutput.glass-panel.active {
     border-color: rgba(59, 130, 246, 0.4);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* Transparent Glassmorphism Cards */
+.glass-card {
+    background: rgba(15, 23, 42, 0.35) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25) !important;
+    transition: all 0.3s ease !important;
+    border-left: none !important;
+    /* Strips colored side borders */
+}
+
+.glass-card:hover {
+    border-color: rgba(96, 165, 250, 0.35) !important;
+    box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Responsive Grid Helper */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+/* Responsive Layout Breakpoints */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 20px 14px;
+        width: 100% !important;
+    }
+
+    .form-row,
+    .checkbox-grid,
+    .responsive-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .radio-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Tight content wrapper without height stretch */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    align-items: start !important;
+    /* Prevents taller cards from stretching shorter ones */
+}
+
+.glass-card {
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+html {
+    scroll-behavior: smooth;
 }
