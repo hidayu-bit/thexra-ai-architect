@@ -25,7 +25,7 @@ loadKnowledgeBases();
 import { GoogleGenAI } from '@google/genai';
 
 // 1. Initialize Gemini API Client
-const GEMINI_API_KEY = "GEMINI_KEY";
+const GEMINI_API_KEY = "GEMINI_API_KEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 // 2. DOM Elements
@@ -186,7 +186,6 @@ intakeForm?.addEventListener('submit', async (e) => {
     }
 
     // --- READ VALUES AFTER VALIDATION ---
-    // --- READ VALUES AFTER VALIDATION ---
     const companyName = document.getElementById('companyName')?.value.trim();
     const industry = document.getElementById('industry')?.value.trim();
     const problem = document.getElementById('problem')?.value.trim();
@@ -286,93 +285,119 @@ Respond ONLY with a raw JSON object (no markdown code blocks):
 
             // Helper to clean up extra whitespace/spaces in sentences
             const cleanText = (str) => (str || '').replace(/\s+/g, ' ').trim();
-
             briefOutput.innerHTML = `
-  <div style="display: flex; flex-direction: column; gap: 0.6rem; text-align: left; width: 100%;" class="glass-card p-3 rounded-xl">
-    <h3 style="color: #60A5FA; font-size: 1.1rem; font-weight: 700; margin: 0 0 0.15rem 0; letter-spacing: -0.01em;">Generated Solution Architecture Brief</h3>
-    
-    <!-- Business Problem, Client Objective & Target Users -->
-    <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-      <p style="margin: 0 0 4px 0; font-size: 13px; line-height: 1.4;"><strong style="color: #60A5FA;">Business Problem:</strong> ${cleanText(data.businessProblem)}</p>
-      <p style="margin: 0 0 4px 0; font-size: 13px; line-height: 1.4;"><strong style="color: #60A5FA;">Client Objective:</strong> ${cleanText(data.clientObjective)}</p>
-      <p style="margin: 0; font-size: 13px; line-height: 1.4;"><strong style="color: #60A5FA;">Target Users:</strong> ${cleanText(data.targetUsers)}</p>
-    </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px; width: 100%;">
+        
+        <!-- 1. Client Problem -->
+        <div class="glass-card" style="padding: 10px 12px; border-radius: 6px;">
+          <span style="font-size: 10px; text-transform: uppercase; color: #38BDF8; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">1. Client Problem</span>
+          <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.3;">${cleanText(data.businessProblem)}</p>
+          <div style="margin-top: 4px; font-size: 11.5px; color: #94A3B8;">
+            <strong style="color: #CBD5E1;">Target Users:</strong> ${cleanText(data.targetUsers || 'N/A')}
+          </div>
+        </div>
 
-    <!-- Solution Concept -->
-    <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-      <strong style="color: #60A5FA; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px;">Solution Concept</strong>
-      <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.4;">${cleanText(data.solutionConcept)}</p>
-    </div>
+        <!-- 2. AI Analysis -->
+        <div class="glass-card" style="padding: 10px 12px; border-radius: 6px;">
+          <span style="font-size: 10px; text-transform: uppercase; color: #C084FC; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">2. AI Analysis & Rationale</span>
+          <p style="margin: 0; color: #CBD5E1; font-size: 13px; line-height: 1.3; font-style: italic;">"${cleanText(data.why)}"</p>
+          ${data.limitations && data.limitations.length > 0 ? `
+            <div style="margin-top: 4px; font-size: 11.5px; color: #F87171;">
+              <strong>Constraints:</strong> ${data.limitations.map(l => cleanText(l)).join(', ')}
+            </div>
+          ` : ''}
+        </div>
 
-    <!-- Primary Tech vs Alternative Recommendation -->
-    <div class="responsive-grid" style="align-items: start;">
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #60A5FA; font-weight: 700; letter-spacing: 0.05em;">Recommended Tech (Primary)</span>
-        <h4 style="margin: 2px 0 0 0; color: #FFF; font-size: 13.5px; font-weight: 600;">${cleanText(data.recommendedTechnology || data.primaryRecommendation)}</h4>
-      </div>
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #94A3B8; font-weight: 700; letter-spacing: 0.05em;">Alternative Recommendation</span>
-        <h4 style="margin: 2px 0 0 0; color: #CBD5E1; font-size: 13.5px; font-weight: 600;">${cleanText(data.alternativeRecommendation)}</h4>
-      </div>
-    </div>
+        <!-- 3. Recommended Solution -->
+        <div class="glass-card" style="padding: 10px 12px; border-radius: 6px;">
+          <span style="font-size: 10px; text-transform: uppercase; color: #FBBF24; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">3. Recommended Solution Concept</span>
+          <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.3;">${cleanText(data.solutionConcept)}</p>
+          
+          ${data.implementationApproach && data.implementationApproach.length > 0 ? `
+            <div style="margin-top: 4px;">
+              <strong style="font-size: 10.5px; color: #FBBF24; text-transform: uppercase; display: block; margin-bottom: 2px;">Implementation Roadmap:</strong>
+              <ol style="margin: 0; padding-left: 16px; color: #CBD5E1; font-size: 12px; line-height: 1.3;">
+                ${data.implementationApproach.map(step => `<li style="margin: 0;">${cleanText(step)}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+        </div>
 
-    <!-- Architectural Rationale (Why) -->
-    <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-      <span style="font-size: 10px; text-transform: uppercase; color: #FBBF24; font-weight: 700; letter-spacing: 0.05em;">Architectural Rationale (Why)</span>
-      <p style="margin: 2px 0 0 0; color: #E2E8F0; font-size: 13px; line-height: 1.4;">${cleanText(data.why)}</p>
-    </div>
+        <!-- 4. Technology Stack -->
+        <div class="glass-card" style="padding: 10px 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
+          <span style="font-size: 10px; text-transform: uppercase; color: #38BDF8; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">4. Technology Selection</span>
+          <h3 style="margin: 0 0 4px 0; color: #FFF; font-size: 14.5px; font-weight: 700;">${cleanText(data.recommendedTechnology)}</h3>
+          
+          <div style="display: flex; gap: 12px; font-size: 11.5px; color: #CBD5E1; flex-wrap: wrap; margin-top: 2px;">
+            <div><strong>Hardware:</strong> ${Array.isArray(data.hardwareRequirements) ? data.hardwareRequirements.join(', ') : (data.hardwareRequirements || 'N/A')}</div>
+            <div><strong>Software:</strong> ${Array.isArray(data.softwareRequirements) ? data.softwareRequirements.join(', ') : (data.softwareRequirements || 'N/A')}</div>
+          </div>
 
-    <!-- Expected Benefits & Limitations -->
-    <div class="responsive-grid" style="align-items: start;">
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #34D399; font-weight: 700; letter-spacing: 0.05em;">Expected Benefits</span>
-        <p style="margin: 2px 0 0 0; color: #CBD5E1; font-size: 12.5px; line-height: 1.35;">${cleanText(data.expectedBenefits)}</p>
-      </div>
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #F87171; font-weight: 700; letter-spacing: 0.05em;">Limitations & Trade-offs</span>
-        <ul style="margin: 2px 0 0 0; padding-left: 14px; color: #CBD5E1; font-size: 12px; line-height: 1.35;">
-          ${Array.isArray(data.limitations) && data.limitations.length > 0 ? data.limitations.map(l => `<li style="margin-bottom: 1px;">${cleanText(l)}</li>`).join('') : '<li style="color: #64748b;">None specified</li>'}
-        </ul>
-      </div>
-    </div>
+          <div style="margin-top: 2px; font-size: 11.5px; color: #94A3B8;">
+            <strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}
+          </div>
+        </div>
 
-    <!-- Hardware & Software Requirements -->
-    <div class="responsive-grid" style="align-items: start;">
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #C084FC; font-weight: 700; letter-spacing: 0.05em;">Hardware Requirements</span>
-        <ul style="margin: 2px 0 0 0; padding-left: 14px; color: #CBD5E1; font-size: 12px; line-height: 1.35;">
-          ${Array.isArray(data.hardwareRequirements) && data.hardwareRequirements.length > 0 ? data.hardwareRequirements.map(h => `<li style="margin-bottom: 1px;">${cleanText(h)}</li>`).join('') : '<li style="color: #64748b;">Standard commercial workstation</li>'}
-        </ul>
-      </div>
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #22D3EE; font-weight: 700; letter-spacing: 0.05em;">Software Requirements</span>
-        <ul style="margin: 2px 0 0 0; padding-left: 14px; color: #CBD5E1; font-size: 12px; line-height: 1.35;">
-          ${Array.isArray(data.softwareRequirements) && data.softwareRequirements.length > 0 ? data.softwareRequirements.map(s => `<li style="margin-bottom: 1px;">${cleanText(s)}</li>`).join('') : '<li style="color: #64748b;">Web browser / THEXRA App</li>'}
-        </ul>
-      </div>
-    </div>
+        <!-- 5. Benefits -->
+        <div class="glass-card" style="padding: 10px 12px; border-radius: 6px;">
+          <span style="font-size: 10px; text-transform: uppercase; color: #34D399; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">5. Expected Benefits & Objectives</span>
+          <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.3;">${cleanText(data.expectedBenefits)}</p>
+          <div style="margin-top: 4px; font-size: 11.5px; color: #94A3B8;">
+            <strong>KPI Alignment:</strong> ${cleanText(data.clientObjective || 'N/A')}
+          </div>
+        </div>
 
-    <!-- Complexity & Implementation Approach -->
-    <div class="responsive-grid" style="align-items: start;">
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #FACC15; font-weight: 700; letter-spacing: 0.05em;">Complexity</span>
-        <p style="margin: 1px 0 0 0; font-weight: 700; color: #FFF; font-size: 13.5px;">${cleanText(data.complexity) || 'Medium'}</p>
-      </div>
-      <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-        <span style="font-size: 10px; text-transform: uppercase; color: #818CF8; font-weight: 700; letter-spacing: 0.05em;">Implementation Approach</span>
-        <ol style="margin: 2px 0 0 0; padding-left: 14px; color: #CBD5E1; font-size: 12px; line-height: 1.35;">
-          ${Array.isArray(data.implementationApproach) && data.implementationApproach.length > 0 ? data.implementationApproach.map(step => `<li style="margin-bottom: 1px;">${cleanText(step)}</li>`).join('') : '<li>Phase 1 Scoping & Deployment</li>'}
-        </ol>
-      </div>
-    </div>
+        <!-- 6. Next Step -->
+        <div class="glass-card" style="padding: 10px 12px; border-radius: 6px;">
+          <span style="font-size: 10px; text-transform: uppercase; color: #34D399; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">6. Recommended Next Step</span>
+          <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.3;">${cleanText(data.recommendedNextStep || data.nextStep)}</p>
+        </div>
 
-    <!-- Recommended Next Step -->
-    <div class="glass-card" style="padding: 10px 12px; border-radius: 8px;">
-      <span style="font-size: 10px; text-transform: uppercase; color: #34D399; font-weight: 700; letter-spacing: 0.05em;">Recommended Next Step</span>
-      <p style="margin: 2px 0 0 0; color: #E2E8F0; font-size: 13px; line-height: 1.4;">${cleanText(data.recommendedNextStep || data.nextStep)}</p>
-    </div>
-  </div>
-`;
+        <!-- Action Bar -->
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+          <button type="button" id="btn-regenerate" style="flex: 1; min-width: 120px; padding: 8px; font-size: 11.5px; background: rgba(59, 130, 246, 0.2); border: 1px solid #3B82F6; color: #60A5FA; border-radius: 5px; cursor: pointer; font-weight: 600;">Regenerate</button>
+          <button type="button" id="btn-edit" style="flex: 1; min-width: 120px; padding: 8px; font-size: 11.5px; background: rgba(148, 163, 184, 0.2); border: 1px solid #64748B; color: #CBD5E1; border-radius: 5px; cursor: pointer; font-weight: 600;">Edit Requirement</button>
+          <button type="button" id="btn-save" style="flex: 1; min-width: 120px; padding: 8px; font-size: 11.5px; background: rgba(52, 211, 153, 0.2); border: 1px solid #10B981; color: #34D399; border-radius: 5px; cursor: pointer; font-weight: 600;">Save Solution</button>
+          <button type="button" id="btn-proposal" style="flex: 1; min-width: 120px; padding: 8px; font-size: 11.5px; background: rgba(192, 132, 252, 0.2); border: 1px solid #A855F7; color: #C084FC; border-radius: 5px; cursor: pointer; font-weight: 600;">Generate Proposal</button>
+        </div>
+
+      </div>
+    `;
+
+
+            // Handlers , Regenerate
+            document.getElementById('btn-regenerate')?.addEventListener('click', () => {
+                // Show loading indicator in output card
+                briefOutput.innerHTML = `
+                <div style="text-align:center; padding: 40px; color: #94A3B8;">
+                <p style="font-size: 16px; font-weight: 600; margin-bottom; 8px;"> Regenerating Solution Brief...</p>
+                <p style="font-size: 13px;">Analyzing requirements...</p> 
+                </div>
+                `;
+                briefOutput.scrollIntoView({ behavior: 'smooth' });
+                intakeForm.requestSubmit();
+            });
+
+            // Edit requirement: Scroll smoothly back up to the form inputs
+            document.getElementById('btn-edit')?.addEventListener('click', () => {
+                intakeForm.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Save solution
+            document.getElementById('btn-save')?.addEventListener('click', () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", 'THEXRA_Solution_Brief.json');
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+            });
+
+            // Generate proposal
+            document.getElementById('btn-proposal')?.addEventListener('click', () => {
+                window.print();
+            });
         }
 
         statusBanner?.scrollIntoView({ behavior: 'smooth' });
