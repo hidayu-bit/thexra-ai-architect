@@ -444,6 +444,30 @@ button[type="submit"]:disabled {
     padding: 8px 10px !important;
 }
 
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #proposalModal,
+    #proposalModal * {
+        visibility: visible;
+    }
+
+    #proposalModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff !important;
+        padding: 0 !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
+
 html {
     scroll-behavior: smooth;
 }

@@ -1,4 +1,5 @@
 // Global variables to store our grounded knowledge bases
+let currentBriefData = null;
 let techKnowledge = {};
 let industryKnowledge = {};
 
@@ -285,6 +286,7 @@ Respond ONLY with a raw JSON object (no markdown code blocks):
 
             // Helper to clean up extra whitespace/spaces in sentences
             const cleanText = (str) => (str || '').replace(/\s+/g, ' ').trim();
+            currentBriefData = data;
             briefOutput.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px; width: 100%;">
         
@@ -383,19 +385,137 @@ Respond ONLY with a raw JSON object (no markdown code blocks):
                 intakeForm.scrollIntoView({ behavior: 'smooth' });
             });
 
-            // Save solution
+            // Save Solution: Export formatted document for Microsoft Word
             document.getElementById('btn-save')?.addEventListener('click', () => {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", 'THEXRA_Solution_Brief.json');
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
+                if (!currentBriefData) {
+                    alert('Please generate a solution brief first before saving.');
+                    return;
+                }
+
+                const data = currentBriefData;
+
+                const htmlDoc = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset="utf-8">
+        <title>THEXRA Solution Brief</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #1e293b; }
+          h1 { color: #0f172a; border-bottom: 2px solid #0f172a; padding-bottom: 8px; font-size: 18pt; }
+          h2 { color: #2563eb; font-size: 12pt; text-transform: uppercase; margin-top: 18pt; margin-bottom: 4pt; }
+          p, li { font-size: 11pt; line-height: 1.5; color: #334155; }
+          .tech-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 12px; margin: 10pt 0; }
+        </style>
+      </head>
+      <body>
+        <h1>THEXRA ENTERPRISE SOLUTION BRIEF</h1>
+        <p><strong>Date:</strong> ${new Date().toLocaleDateString()} | <strong>Status:</strong> Approved Architecture Brief</p>
+        
+        <h2>1. Client Problem Statement</h2>
+        <p>${cleanText(data.businessProblem)}</p>
+        <p><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'N/A')}</p>
+
+        <h2>2. AI Rationale & Analysis</h2>
+        <p><em>"${cleanText(data.why)}"</em></p>
+        ${data.limitations && data.limitations.length > 0 ? `<p><strong>Constraints:</strong> ${data.limitations.map(l => cleanText(l)).join(', ')}</p>` : ''}
+
+        <h2>3. Proposed Solution Concept</h2>
+        <p>${cleanText(data.solutionConcept)}</p>
+
+        <div class="tech-box">
+          <h2 style="margin-top:0; color:#0f172a;">4. Technology Architecture Selection</h2>
+          <p style="font-size:14pt; font-weight:bold; color:#0f172a;">${cleanText(data.recommendedTechnology)}</p>
+          <p><strong>Hardware Specs:</strong> ${Array.isArray(data.hardwareRequirements) ? data.hardwareRequirements.join(', ') : (data.hardwareRequirements || 'N/A')}</p>
+          <p><strong>Software Specs:</strong> ${Array.isArray(data.softwareRequirements) ? data.softwareRequirements.join(', ') : (data.softwareRequirements || 'N/A')}</p>
+          <p><strong>Alternative Technology:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
+        </div>
+
+        <h2>5. Expected Business Outcomes & KPIs</h2>
+        <p>${cleanText(data.expectedBenefits)}</p>
+        <p><strong>KPI Alignment:</strong> ${cleanText(data.clientObjective || 'N/A')}</p>
+
+        <h2>6. Recommended Next Steps</h2>
+        <p>${cleanText(data.recommendedNextStep || data.nextStep)}</p>
+      </body>
+      </html>
+    `;
+
+                const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `THEXRA-Solution-Brief-${Date.now()}.doc`;
+                link.click();
+                URL.revokeObjectURL(link.href);
             });
 
-            // Generate proposal
+
+            // Generate Proposal: Opens clean document preview modal
             document.getElementById('btn-proposal')?.addEventListener('click', () => {
+                const modal = document.getElementById('proposalModal');
+                const content = document.getElementById('proposalContent');
+
+                if (!modal || !content) return;
+
+                // Inject document view
+                content.innerHTML = `
+      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+          <h1 style="margin: 0; font-size: 20px; color: #0f172a; font-weight: 700;">THEXRA ENTERPRISE SOLUTION PROPOSAL</h1>
+          <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">Architecture Recommendation Brief</p>
+        </div>
+        <div style="text-align: right; font-size: 11px; color: #64748b;">
+          <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
+          <strong>Status:</strong> Draft
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px; font-size: 13px; line-height: 1.6; color: #334155;">
+        <div>
+          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">1. Client Problem Statement</strong>
+          <p style="margin: 0;">${cleanText(data.businessProblem)}</p>
+        </div>
+
+        <div>
+          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">2. AI Rationale & Analysis</strong>
+          <p style="margin: 0; font-style: italic; color: #475569;">"${cleanText(data.why)}"</p>
+        </div>
+
+        <div>
+          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">3. Proposed Solution Concept</strong>
+          <p style="margin: 0;">${cleanText(data.solutionConcept)}</p>
+        </div>
+
+        <div style="background: #f8fafc; padding: 16px; border-radius: 6px; border-left: 4px solid #2563eb;">
+          <strong style="font-size: 11px; text-transform: uppercase; color: #0f172a; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Architecture</strong>
+          <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #0f172a;">${cleanText(data.recommendedTechnology)}</h3>
+          <div style="font-size: 12px; color: #475569;">
+            <p style="margin: 0 0 4px 0;"><strong>Hardware Specs:</strong> ${Array.isArray(data.hardwareRequirements) ? data.hardwareRequirements.join(', ') : (data.hardwareRequirements || 'N/A')}</p>
+            <p style="margin: 0 0 4px 0;"><strong>Software Specs:</strong> ${Array.isArray(data.softwareRequirements) ? data.softwareRequirements.join(', ') : (data.softwareRequirements || 'N/A')}</p>
+            <p style="margin: 0;"><strong>Alternative Technology:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
+          </div>
+        </div>
+
+        <div>
+          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">5. Expected Business Outcomes</strong>
+          <p style="margin: 0;">${cleanText(data.expectedBenefits)}</p>
+        </div>
+
+        <div>
+          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">6. Implementation Next Steps</strong>
+          <p style="margin: 0;">${cleanText(data.recommendedNextStep || data.nextStep)}</p>
+        </div>
+      </div>
+    `;
+
+                modal.style.display = 'block';
+            });
+
+            // Modal button controls
+            document.getElementById('btn-modal-close')?.addEventListener('click', () => {
+                document.getElementById('proposalModal').style.display = 'none';
+            });
+
+            document.getElementById('btn-modal-print')?.addEventListener('click', () => {
                 window.print();
             });
         }
