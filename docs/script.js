@@ -41,7 +41,7 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: 'gemini-3.8-flash',
         contents: systemPrompt,
         config: {
           responseMimeType: "application/json",
@@ -217,72 +217,48 @@ intakeForm?.addEventListener('submit', async (e) => {
   const techContext = techKnowledge ? JSON.stringify(techKnowledge) : "";
   const industryContext = selectedIndustryData ? JSON.stringify(selectedIndustryData) : "";
 
-  const systemPrompt = `BE CONCISE AND DIRECT. Limit each JSON field string to essential architectural details only.
+  const systemPrompt = `Role: Expert Enterprise AI & Solution Architect for THEXRA.
+Task: Analyze client intake data using grounded technology knowledge (${techContext}) and industry knowledge (${industryContext}). Be concise and direct.
 
-You are an expert Enterprise AI & Solution Architect for THEXRA. Analyze the following SPECIFIC client intake submission using the grounded technology knowledge base (${techContext}) and industry knowledge base (${industryContext}).
+CLIENT DATA:
+- Company: ${companyName}
+- Industry: ${industry}
+- Core Problem: ${problem}
+- Target User: ${targetPersona} (${targetUserCount} users)
+- Current Process: ${currentProcess}
+- Outcome/KPIs: ${desiredOutcome}
+- Budget: ${budgetRange}
+- Timeline: ${timeline}
 
-CLIENT SUBMISSION DATA:
-- Company Name: 
-${companyName}
-- Industry Vertical: 
-${industry}
-- Core Problem / Friction: 
-${problem}
-- Target End User Persona: 
-${targetPersona} (${targetUserCount} users)
-- Current Operational Process: 
-${currentProcess}
-- Desired KPIs / Outcome: 
-${desiredOutcome}
-- Budget Range: 
-${budgetRange}
-- Delivery Timeline: 
-${timeline}
-
-ALLOWED TECHNOLOGY CATEGORIES ONLY:
-- AR
-- VR
-- MR
-- AI
-- Digital Twin
-- Simulator
-- Interactive Display
-- Location-Based Experience
-- Mobile/Web
-- Combination solution
+ALLOWED CATEGORIES:
+AR, VR, MR, AI, Digital Twin, Simulator, Interactive Display, Location-Based Experience, Mobile/Web, Combination solution
 
 CRITICAL FORMAT RULES:
-1. "recommendedTechnology": Select the single BEST FIT category based on the client's specific problem above.
-   - You MUST use real THEXRA product names found directly inside the technology knowledge base (${techContext}). NEVER fabricate non-existent products.
-   - Format as: "[Category] — THEXRA [Product Name from Knowledge Base]".
-2. "why": Provide ONLY 2 concise sentences of architectural rationale:
-   - Sentence 1: Why the fundamental tech category solves the client's specific operational bottleneck (${problem}).
-   - Sentence 2: Why the THEXRA platform is the ideal deployment choice for ${companyName}.
-3. DO NOT output any system confirmation phrases or chatter.
-
-Respond ONLY with a raw JSON object (no markdown code blocks):
+1. "recommendedTechnology": Best-fit category. MUST use exact THEXRA product names from tech knowledge base (${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent products.
+2. "why": Exactly 2 concise sentences: (1) Why tech category solves ${problem}, (2) Why THEXRA suits ${companyName}.
+3. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
 
 {
-  "businessProblem": "Summarize the specific client problem",
-  "clientObjective": "Summarize the specific client goal & KPI",
+  "businessProblem": "Summarize client problem",
+  "clientObjective": "Summarize goal & KPI",
   "recommendedTechnology": "Category — THEXRA Product Name",
-  "solutionConcept": "High-level architectural overview for this exact client",
+  "solutionConcept": "High-level architectural concept",
   "targetUsers": "Primary user personas",
   "expectedBenefits": "Key quantitative operational gains",
   "complexity": "Low | Medium | High",
-  "recommendedNextStep": "Recommended immediate technical scoping action",
+  "recommendedNextStep": "Immediate technical scoping action",
   "alternativeRecommendation": "Category — THEXRA Product Name",
   "why": "Two concise sentences of architectural reasoning addressing this client.",
   "solutionArchitecture": {
-    "solutionOverview": "Concise 2-3 sentence technical overview of the architecture.",
-    "userJourney": "Step-by-step user workflow from start to completion.",
-    "hardware": ["Specific Hardware Item 1", "Specific Hardware Item 2"],
-    "software": ["Specific Software Item 1", "Specific Software Item 2"],
+    "solutionOverview": "Concise 2-3 sentence technical overview",
+    "userJourney": "Step-by-step user workflow",
+    "hardware": ["Hardware Item 1", "Hardware Item 2"],
+    "software": ["Software Item 1", "Software Item 2"],
     "aiComponents": ["AI/ML Feature 1", "AI/ML Feature 2"],
     "xrComponents": ["XR/Spatial Feature 1", "XR/Spatial Feature 2"],
-    "backend": ["Backend/Server Infrastructure 1", "Database/Protocol 2"],
-    "dashboard": ["Admin/User Interface Module 1", "Analytics Module 2"],
-    "dataFlow": "Step-by-step data pipeline: Device -> Edge -> Cloud -> Display"
+    "backend": ["Backend Infra 1", "Database/Protocol 2"],
+    "dashboard": ["Admin/UI Module 1", "Analytics Module 2"],
+    "dataFlow": "Device -> Edge -> Cloud -> Display"
   },
   "implementationApproach": ["Phase 1 description", "Phase 2 description", "Phase 3 description"]
 }`;
