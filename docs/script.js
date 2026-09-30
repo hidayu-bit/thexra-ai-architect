@@ -51,37 +51,33 @@ function renderArchitectureDiagram(architectureData, isProposal = false) {
     { label: 'Step 5: Dashboard', val: dash, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' }
   ];
 
-  // Proposal gets crisp white cards with dark slate text; Main UI gets glassmorphism cards with light text
+  // Proposal gets white cards with dark text; Main UI gets glassmorphism dark cards with light text
   const cardBg = isProposal ? '#FFFFFF' : 'rgba(255, 255, 255, 0.05)';
   const bodyTextColor = isProposal ? '#1E293B' : '#CBD5E1';
   const arrowColor = isProposal ? '#94A3B8' : '#38BDF8';
 
-  // Center alignment for Main UI, left-alignment for Proposal
-  const textAlign = isProposal ? 'left' : 'center';
-  const alignSelf = isProposal ? 'flex-start' : 'center';
-
   return `
     <div style="display: flex; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 6px; width: 100%; margin: 8px 0; font-family: inherit; overflow-x: auto;">
       ${steps.map((step, idx) => `
-        <!-- Node Card -->
+        <!-- Node Card (Forced Left & Top Alignment Everywhere) -->
         <div style="
           flex: 1; 
           min-width: 110px; 
-          padding: 8px 10px; 
+          padding: 10px 12px; 
           border-radius: 6px; 
           border: 1px solid ${step.border}; 
           background: ${cardBg}; 
-          text-align: ${textAlign};
+          text-align: left !important;
           box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: ${alignSelf};
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: flex-start !important;
+          align-items: flex-start !important;
         ">
-          <span style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${step.color}; letter-spacing: 0.05em; display: block; margin-bottom: 6px; text-align:${textAlign};">
+          <span style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${step.color}; letter-spacing: 0.05em; display: block; margin-bottom: 6px; text-align: left !important; width: 100%;">
             ${step.label}
           </span>
-          <span style="font-size: 11px; font-weight: 400; color: ${bodyTextColor} !important; line-height: 1.3; display: block; text-align:${textAlign};">
+          <span style="font-size: 11px; font-weight: 400; color: ${bodyTextColor} !important; line-height: 1.35; display: block; text-align: left !important; width: 100%;">
             ${step.val}
           </span>
         </div>

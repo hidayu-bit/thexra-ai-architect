@@ -444,55 +444,59 @@ button[type="submit"]:disabled {
     padding: 8px 10px !important;
 }
 
+/* Printable PDF Export Optimization */
 @media print {
 
-    /* Hide background dashboard and UI controls */
+    /* 1. Hide background UI and scrollbars */
+    body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     body * {
         visibility: hidden;
     }
 
-    /* Show only the proposal modal content */
+    /* 2. Show only proposal content and force full page width */
     #proposalModal,
     #proposalContent,
     #proposalContent * {
-        visibility: visible;
+        visibility: visible !important;
     }
 
-    /* Unroll the modal so it spans across full printable pages */
     #proposalModal {
-        position: static !important;
-        top: auto !important;
-        left: auto !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 100% !important;
-        overflow: visible !important;
         background: #ffffff !important;
-        box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
+        box-shadow: none !important;
+        overflow: visible !important;
     }
 
     #proposalContent {
-        position: static !important;
+        position: relative !important;
         width: 100% !important;
         max-width: 100% !important;
-        height: auto !important;
-        max-height: none !important;
-        overflow: visible !important;
         padding: 0 !important;
         margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
-    /* Force the diagram to fit printable page width without scrollbars */
-    #proposalContent div[style*="overflow-x: auto"] {
-        overflow-x: visible !important;
+    /* 3. Fix the System Flow Diagram in PDF view */
+    #proposalContent div[style*="overflow-x"] {
+        overflow: visible !important;
     }
 
-    /* Prevent page breaks inside critical sections */
-    .tech-box,
-    #proposalContent>div>div {
-        page-break-inside: avoid;
+    /* Ensure node cards scale cleanly across printable page width */
+    #proposalContent div[style*="display: flex"] {
+        width: 100% !important;
+        justify-content: space-between !important;
     }
 }
 

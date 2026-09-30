@@ -78,3 +78,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Grid UI Engine:** Redesigned Card 4 into a multi-column grid layout with high-contrast text and clean data flow styling.
 - **Unified Export & Preview:** Synchronized all 9 modules across the main output UI, document proposal modal, and Microsoft Word export files.
 - **Cross-Industry Scoping:** Validated dynamic architecture generation across Energy, Tourism, Healthcare, and Government test scenarios.
+
+## Day 12 — System Architecture Diagram Renderer 
+- **Dynamic Flowchart Generator:** Implemented a custom JS diagram helper (`renderArchitectureDiagram`) that maps 9-module system scoping data into a 5-step visual pipeline (Device -> Experience -> App & AI -> Cloud & DB -> Dashboard).
+- **Theme-Aware Styling & Alignment:** Standardized box alignment to top-left and matched card visuals across both UI.
+- **Print & PDF Layout Optimization:** Added `@media print` CSS rules to unroll modal containers to 100% full-page width, resolving squeezed layout columns and preventing diagram cutoffs on PDF export.
+- **Multi-Industry Scoping Briefs:** Created concise intake form test cases for Energy, Entertainment, and Tourism verticals to validate AI system prompt generation.
