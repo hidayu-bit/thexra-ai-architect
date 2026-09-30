@@ -29,12 +29,78 @@ import { GoogleGenAI } from '@google/genai';
 const GEMINI_API_KEY = "GEMINI_API_KEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
+/**
+ * Helper to generate a visual architecture flowchart from solution architecture data
+ */
+function renderArchitectureDiagram(architectureData, isProposal = false) {
+  if (!architectureData) return '';
+
+  const hw = (architectureData.hardware || [])[0] || 'Client Device';
+  const xr = (architectureData.xrComponents || [])[0] || 'Interactive Visuals';
+  const sw = (architectureData.software || [])[0] || 'THEXRA Platform';
+  const aiComponents = (architectureData.aiComponents || [])[0] || 'Smart Automation';
+  const backend = (architectureData.backend || [])[0] || 'Secure Cloud Storage';
+  const dash = (architectureData.dashboard || [])[0] || 'Reporting Portal';
+
+  // Configured step colors
+  const steps = [
+    { label: 'Step 1: Device', val: hw, color: '#38BDF8', border: isProposal ? '#38BDF8' : 'rgba(56, 189, 248, 0.3)' },
+    { label: 'Step 2: Experience', val: xr, color: '#38BDF8', border: isProposal ? '#38BDF8' : 'rgba(56, 189, 248, 0.3)' },
+    { label: 'Step 3: App & AI', val: `${sw} (${aiComponents})`, color: isProposal ? '#9333EA' : '#C084FC', border: isProposal ? '#C084FC' : 'rgba(192, 132, 252, 0.3)' },
+    { label: 'Step 4: Cloud & DB', val: backend, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' },
+    { label: 'Step 5: Dashboard', val: dash, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' }
+  ];
+
+  // Proposal gets crisp white cards with dark slate text; Main UI gets glassmorphism cards with light text
+  const cardBg = isProposal ? '#FFFFFF' : 'rgba(255, 255, 255, 0.05)';
+  const bodyTextColor = isProposal ? '#1E293B' : '#CBD5E1';
+  const arrowColor = isProposal ? '#94A3B8' : '#38BDF8';
+
+  // Center alignment for Main UI, left-alignment for Proposal
+  const textAlign = isProposal ? 'left' : 'center';
+  const alignSelf = isProposal ? 'flex-start' : 'center';
+
+  return `
+    <div style="display: flex; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 6px; width: 100%; margin: 8px 0; font-family: inherit; overflow-x: auto;">
+      ${steps.map((step, idx) => `
+        <!-- Node Card -->
+        <div style="
+          flex: 1; 
+          min-width: 110px; 
+          padding: 8px 10px; 
+          border-radius: 6px; 
+          border: 1px solid ${step.border}; 
+          background: ${cardBg}; 
+          text-align: ${textAlign};
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: ${alignSelf};
+        ">
+          <span style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${step.color}; letter-spacing: 0.05em; display: block; margin-bottom: 6px; text-align:${textAlign};">
+            ${step.label}
+          </span>
+          <span style="font-size: 11px; font-weight: 400; color: ${bodyTextColor} !important; line-height: 1.3; display: block; text-align:${textAlign};">
+            ${step.val}
+          </span>
+        </div>
+
+        <!-- Connector Arrow -->
+        ${idx < steps.length - 1 ? `
+          <span style="color: ${arrowColor}; font-size: 11px; font-weight: 700; flex-shrink: 0; align-self: center;">➔</span>
+        ` : ''}
+      `).join('')}
+    </div>
+  `;
+}
+
 // 2. DOM Elements
 const intakeForm = document.getElementById('intake-form');
 const statusBanner = document.getElementById('form-status');
 const briefOutput = document.getElementById('aiOutput');
 
-// 3. Helper function to call gemini-3.6-flash with automatic retries on high demand / rate limits
+// 3. Helper function to call gemini-3.8-flash with automatic retries on high demand / rate limits
 async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
   let delay = 3000; // Start with 3-second delay
 
@@ -221,20 +287,29 @@ intakeForm?.addEventListener('submit', async (e) => {
 Task: Analyze client intake data using grounded technology knowledge (${techContext}) and industry knowledge (${industryContext}). Be concise and direct.
 
 CLIENT DATA:
-- Company: ${companyName}
-- Industry: ${industry}
-- Core Problem: ${problem}
-- Target User: ${targetPersona} (${targetUserCount} users)
-- Current Process: ${currentProcess}
-- Outcome/KPIs: ${desiredOutcome}
-- Budget: ${budgetRange}
-- Timeline: ${timeline}
+- Company: 
+${companyName}
+- Industry: 
+${industry}
+- Core Problem: 
+${problem}
+- Target User: 
+${targetPersona} (${targetUserCount} users)
+- Current Process: 
+${currentProcess}
+- Outcome/KPIs: 
+${desiredOutcome}
+- Budget: 
+${budgetRange}
+- Timeline: 
+${timeline}
 
 ALLOWED CATEGORIES:
 AR, VR, MR, AI, Digital Twin, Simulator, Interactive Display, Location-Based Experience, Mobile/Web, Combination solution
 
 CRITICAL FORMAT RULES:
-1. "recommendedTechnology": Best-fit category. MUST use exact THEXRA product names from tech knowledge base (${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent products.
+1. "recommendedTechnology": Best-fit category. MUST use exact THEXRA product names from tech knowledge base (
+${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent products.
 2. "why": Exactly 2 concise sentences: (1) Why tech category solves ${problem}, (2) Why THEXRA suits ${companyName}.
 3. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
 
@@ -319,6 +394,12 @@ CRITICAL FORMAT RULES:
         <div class="glass-card" style="padding: 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
           <span style="font-size: 10px; text-transform: uppercase; color: #38BDF8; font-weight: 700; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Selection</span>
           <h3 style="margin: 0 0 10px 0; color: #FFF; font-size: 14.5px; font-weight: 700;">${cleanText(data.recommendedTechnology)}</h3>
+
+          <!-- Visual System Diagram Flow (Main UI Mode) -->
+          <div style="margin-bottom: 12px; padding: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 6px; border: 1px dashed rgba(56, 189, 248, 0.3);">
+            <strong style="color: #38BDF8; font-size: 10.5px; text-transform: uppercase; display: block; margin-bottom: 8px;">Automated System Flow Diagram:</strong>
+            ${renderArchitectureDiagram(data.solutionArchitecture, false)}
+          </div>
           
           ${data.solutionArchitecture ? `
             <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #CBD5E1;">
@@ -358,7 +439,7 @@ CRITICAL FORMAT RULES:
 
                 <div style="background: rgba(255,255,255,0.05); padding: 8px 10px; border-radius: 4px; text-align: left; grid-column: 1 / -1;">
                   <strong style="color: #38BDF8; display: block; font-size: 10.5px; text-transform: uppercase; margin-bottom: 2px;">9. Data Flow</strong>
-<span style="font-size: 12px; color: #CBD5E1; font-family: monospace; display: block;">${cleanText(data.solutionArchitecture.dataFlow)}</span>
+                  <span style="font-size: 12px; color: #CBD5E1; font-family: monospace; display: block;">${cleanText(data.solutionArchitecture.dataFlow)}</span>
                 </div>
               </div>
 
@@ -522,6 +603,13 @@ CRITICAL FORMAT RULES:
         <div style="background: #f8fafc; padding: 16px; border-radius: 6px; border-left: 4px solid #2563eb;">
           <strong style="font-size: 11px; text-transform: uppercase; color: #0f172a; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Architecture Blueprint</strong>
           <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #0f172a;">${cleanText(data.recommendedTechnology)}</h3>
+
+          <!-- Visual System Diagram Flow (Proposal Light Mode) -->
+          <div style="margin: 10px 0; padding: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <strong style="font-size: 10px; text-transform: uppercase; color: #2563eb; display: block; margin-bottom: 6px;">Automated System Flow Diagram:</strong>
+            ${renderArchitectureDiagram(data.solutionArchitecture, true)}
+          </div>
+
           ${data.solutionArchitecture ? `
             <div style="font-size: 12px; color: #334155; display: flex; flex-direction: column; gap: 6px;">
               <p style="margin:0;"><strong>1. Overview:</strong> ${cleanText(data.solutionArchitecture.solutionOverview)}</p>

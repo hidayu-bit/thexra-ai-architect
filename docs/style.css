@@ -445,26 +445,54 @@ button[type="submit"]:disabled {
 }
 
 @media print {
+
+    /* Hide background dashboard and UI controls */
     body * {
         visibility: hidden;
     }
 
+    /* Show only the proposal modal content */
     #proposalModal,
-    #proposalModal * {
+    #proposalContent,
+    #proposalContent * {
         visibility: visible;
     }
 
+    /* Unroll the modal so it spans across full printable pages */
     #proposalModal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
         background: #ffffff !important;
+        box-shadow: none !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
 
-    .no-print {
-        display: none !important;
+    #proposalContent {
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Force the diagram to fit printable page width without scrollbars */
+    #proposalContent div[style*="overflow-x: auto"] {
+        overflow-x: visible !important;
+    }
+
+    /* Prevent page breaks inside critical sections */
+    .tech-box,
+    #proposalContent>div>div {
+        page-break-inside: avoid;
     }
 }
 
