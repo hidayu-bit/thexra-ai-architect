@@ -3,6 +3,9 @@ let currentBriefData = null;
 let techKnowledge = {};
 let industryKnowledge = {};
 
+// Global helper to clean whitespace safely everywhere
+const cleanText = (str) => (str || '').replace(/\s+/g, ' ').trim();
+
 // Asynchronously load both JSON knowledge bases
 async function loadKnowledgeBases() {
   try {
@@ -51,19 +54,17 @@ function renderArchitectureDiagram(architectureData, isProposal = false) {
     { label: 'Step 5: Dashboard', val: dash, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' }
   ];
 
-  // Proposal gets white cards with dark text; Main UI gets glassmorphism dark cards with light text
   const cardBg = isProposal ? '#FFFFFF' : 'rgba(255, 255, 255, 0.05)';
   const bodyTextColor = isProposal ? '#1E293B' : '#CBD5E1';
   const arrowColor = isProposal ? '#94A3B8' : '#38BDF8';
 
   return `
-    <div style="display: flex; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 6px; width: 100%; margin: 8px 0; font-family: inherit; overflow-x: auto;">
+    <div style="display: flex; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 6px; width: 100%; margin: 6px 0; font-family: inherit; overflow-x: auto;">
       ${steps.map((step, idx) => `
-        <!-- Node Card (Forced Left & Top Alignment Everywhere) -->
         <div style="
           flex: 1; 
           min-width: 110px; 
-          padding: 10px 12px; 
+          padding: 8px 10px; 
           border-radius: 6px; 
           border: 1px solid ${step.border}; 
           background: ${cardBg}; 
@@ -74,15 +75,13 @@ function renderArchitectureDiagram(architectureData, isProposal = false) {
           justify-content: flex-start !important;
           align-items: flex-start !important;
         ">
-          <span style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${step.color}; letter-spacing: 0.05em; display: block; margin-bottom: 6px; text-align: left !important; width: 100%;">
+          <span style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${step.color}; letter-spacing: 0.05em; display: block; margin-bottom: 4px; text-align: left !important; width: 100%;">
             ${step.label}
           </span>
-          <span style="font-size: 11px; font-weight: 400; color: ${bodyTextColor} !important; line-height: 1.35; display: block; text-align: left !important; width: 100%;">
+          <span style="font-size: 11px; font-weight: 400; color: ${bodyTextColor} !important; line-height: 1.3; display: block; text-align: left !important; width: 100%;">
             ${step.val}
           </span>
         </div>
-
-        <!-- Connector Arrow -->
         ${idx < steps.length - 1 ? `
           <span style="color: ${arrowColor}; font-size: 11px; font-weight: 700; flex-shrink: 0; align-self: center;">➔</span>
         ` : ''}
@@ -91,14 +90,32 @@ function renderArchitectureDiagram(architectureData, isProposal = false) {
   `;
 }
 
+// Render Implementation Plan structure <ol>
+function renderImplementationPlan(planData, isProposal = false) {
+  if (!planData || !Array.isArray(planData)) return '';
+
+  const stageColor = isProposal ? '#0284C7' : '#38BDF8';
+  const textColor = isProposal ? '#334155' : '#CBD5E1';
+  const durationColor = isProposal ? '#64748B' : '#94A3B8';
+
+  return `
+    <ol style="margin: 0; padding-left: 16px; color: ${textColor}; font-size: 12px; line-height: 1.3;">
+      ${planData.map((item) => {
+    const deliverablesText = Array.isArray(item.deliverables) ? item.deliverables.join(' • ') : item.deliverables;
+    return `<li style="margin: 0;"><strong style="color: ${stageColor};">${cleanText(item.stage)}</strong> <span style="color: ${durationColor};">(${cleanText(item.duration)}):</span>${cleanText(deliverablesText)}</li>`;
+  }).join('')}
+    </ol>
+  `;
+}
+
 // 2. DOM Elements
 const intakeForm = document.getElementById('intake-form');
 const statusBanner = document.getElementById('form-status');
 const briefOutput = document.getElementById('aiOutput');
 
-// 3. Helper function to call gemini-3.8-flash with automatic retries on high demand / rate limits
+// 3. Helper function to call gemini-3.8-flash with automatic retries
 async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
-  let delay = 3000; // Start with 3-second delay
+  let delay = 3000;
 
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -142,6 +159,18 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
               implementationApproach: {
                 type: "ARRAY",
                 items: { type: "STRING" }
+              },
+              implementationPlan: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    stage: { type: "STRING" },
+                    duration: { type: "STRING" },
+                    deliverables: { type: "ARRAY", items: { type: "STRING" } }
+                  },
+                  required: ["stage", "duration", "deliverables"]
+                }
               }
             },
             required: [
@@ -157,22 +186,18 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
               "why",
               "limitations",
               "solutionArchitecture",
-              "implementationApproach"
-            ],
-          },
-        },
+              "implementationApproach",
+              "implementationPlan"
+            ]
+          }
+        }
       });
     } catch (err) {
       const errString = (err.message || '').toLowerCase();
-
-      const isRateLimited = errString.includes('503') ||
-        errString.includes('429') ||
-        errString.includes('demand') ||
-        errString.includes('quota') ||
-        errString.includes('busy');
+      const isRateLimited = errString.includes('503') || errString.includes('429') || errString.includes('demand') || errString.includes('quota') || errString.includes('busy');
 
       if (isRateLimited && i < maxRetries - 1) {
-        console.warn(`Server busy / High demand. Retrying in ${delay / 1000}s... (Attempt ${i + 1}/${maxRetries})`);
+        console.warn(`Server busy. Retrying in ${delay / 1000}s...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
         delay *= 2;
       } else {
@@ -188,7 +213,6 @@ intakeForm?.addEventListener('submit', async (e) => {
 
   let hasError = false;
 
-  // Standard inputs validation
   const requiredFields = intakeForm.querySelectorAll('input[required]:not([type="radio"]):not([type="checkbox"]), textarea[required], select[required]');
 
   requiredFields.forEach((field) => {
@@ -212,7 +236,6 @@ intakeForm?.addEventListener('submit', async (e) => {
     }
   });
 
-  // Radio button validation
   const radioGroups = new Set();
   intakeForm.querySelectorAll('input[type="radio"][required]').forEach(radio => radioGroups.add(radio.name));
 
@@ -248,7 +271,6 @@ intakeForm?.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Read Form Input Values
   const companyName = document.getElementById('companyName')?.value.trim();
   const industry = document.getElementById('industry')?.value.trim();
   const problem = document.getElementById('problem')?.value.trim();
@@ -280,7 +302,7 @@ intakeForm?.addEventListener('submit', async (e) => {
   const industryContext = selectedIndustryData ? JSON.stringify(selectedIndustryData) : "";
 
   const systemPrompt = `Role: Expert Enterprise AI & Solution Architect for THEXRA.
-Task: Analyze client intake data using grounded technology knowledge (${techContext}) and industry knowledge (${industryContext}). Be concise and direct.
+Task: Analyze client intake data using grounded technology knowledge (${techContext}) and industry knowledge (${industryContext}). Be concise, clear, and direct.
 
 CLIENT DATA:
 - Company: 
@@ -297,7 +319,7 @@ ${currentProcess}
 ${desiredOutcome}
 - Budget: 
 ${budgetRange}
-- Timeline: 
+- Timeline Target: 
 ${timeline}
 
 ALLOWED CATEGORIES:
@@ -307,7 +329,11 @@ CRITICAL FORMAT RULES:
 1. "recommendedTechnology": Best-fit category. MUST use exact THEXRA product names from tech knowledge base (
 ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent products.
 2. "why": Exactly 2 concise sentences: (1) Why tech category solves ${problem}, (2) Why THEXRA suits ${companyName}.
-3. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
+3. "implementationPlan": MUST contain exactly 7 sequential stages: Discovery, Design, Prototype, Development, Testing, Deployment, Support. 
+   - Durations MUST be formatted cleanly (e.g., "1 week", "1.5 weeks", "2 weeks", "Ongoing").
+   - Deliverables MUST be straightforward, non-jargon, clear business items that anyone can easily understand.
+   - Cumulative time across stages 1 to 6 MUST strictly fit the selected timeline (${timeline}).
+4. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
 
 {
   "businessProblem": "Summarize client problem",
@@ -331,7 +357,16 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
     "dashboard": ["Admin/UI Module 1", "Analytics Module 2"],
     "dataFlow": "Device -> Edge -> Cloud -> Display"
   },
-  "implementationApproach": ["Phase 1 description", "Phase 2 description", "Phase 3 description"]
+  "implementationApproach": ["Phase 1 description", "Phase 2 description", "Phase 3 description"],
+  "implementationPlan": [
+    { "stage": "Discovery", "duration": "1 week", "deliverables": ["Audit report", "Technical specs"] },
+    { "stage": "Design", "duration": "1.5 weeks", "deliverables": ["UI mockups", "Spatial standards"] },
+    { "stage": "Prototype", "duration": "1.5 weeks", "deliverables": ["Working prototype", "Validation report"] },
+    { "stage": "Development", "duration": "3 weeks", "deliverables": ["Core feature build", "Backend sync setup"] },
+    { "stage": "Testing", "duration": "1.5 weeks", "deliverables": ["Cross-device QA", "Performance benchmark"] },
+    { "stage": "Deployment", "duration": "1.5 weeks", "deliverables": ["Production release", "Telemetry verification"] },
+    { "stage": "Support", "duration": "Ongoing", "deliverables": ["SLA maintenance", "Monthly analytics report"] }
+  ]
 }`;
 
   try {
@@ -346,7 +381,6 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
     if (briefOutput) {
       briefOutput.className = 'glass-panel active';
 
-      const cleanText = (str) => (str || '').replace(/\s+/g, ' ').trim();
       currentBriefData = data;
       briefOutput.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px; width: 100%;">
@@ -371,17 +405,26 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
           ` : ''}
         </div>
 
-        <!-- 3. Recommended Solution -->
+        <!-- 3. Recommended Solution Concept -->
         <div class="glass-card" style="padding: 10px 12px; border-radius: 6px;">
           <span style="font-size: 10px; text-transform: uppercase; color: #FBBF24; font-weight: 700; letter-spacing: 0.05em; display: block; margin: 0 0 4px 0;">3. Recommended Solution Concept</span>
           <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.3;">${cleanText(data.solutionConcept)}</p>
-          
+
+          <!-- 1st <ol> List: Implementation Approach -->
           ${data.implementationApproach && data.implementationApproach.length > 0 ? `
-            <div style="margin-top: 4px;">
-              <strong style="font-size: 10.5px; color: #FBBF24; text-transform: uppercase; display: block; margin-bottom: 2px;">Implementation Roadmap:</strong>
+            <div style="margin-top: 6px;">
+              <strong style="font-size: 10.5px; color: #FBBF24; text-transform: uppercase; display: block; margin-bottom: 2px;">Implementation Approach:</strong>
               <ol style="margin: 0; padding-left: 16px; color: #CBD5E1; font-size: 12px; line-height: 1.3;">
                 ${data.implementationApproach.map(step => `<li style="margin: 0;">${cleanText(step)}</li>`).join('')}
               </ol>
+            </div>
+          ` : ''}
+
+          <!-- 2nd <ol> List: Detailed Implementation Plan -->
+          ${data.implementationPlan ? `
+            <div style="margin-top: 6px;">
+              <strong style="font-size: 10.5px; color: #38BDF8; text-transform: uppercase; display: block; margin-bottom: 2px;">Detailed Implementation Plan:</strong>
+              ${renderImplementationPlan(data.implementationPlan, false)}
             </div>
           ` : ''}
         </div>
@@ -391,7 +434,6 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
           <span style="font-size: 10px; text-transform: uppercase; color: #38BDF8; font-weight: 700; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Selection</span>
           <h3 style="margin: 0 0 10px 0; color: #FFF; font-size: 14.5px; font-weight: 700;">${cleanText(data.recommendedTechnology)}</h3>
 
-          <!-- Visual System Diagram Flow (Main UI Mode) -->
           <div style="margin-bottom: 12px; padding: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 6px; border: 1px dashed rgba(56, 189, 248, 0.3);">
             <strong style="color: #38BDF8; font-size: 10.5px; text-transform: uppercase; display: block; margin-bottom: 8px;">Automated System Flow Diagram:</strong>
             ${renderArchitectureDiagram(data.solutionArchitecture, false)}
@@ -569,7 +611,7 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         if (!modal || !content) return;
 
         content.innerHTML = `
-      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
           <h1 style="margin: 0; font-size: 20px; color: #0f172a; font-weight: 700;">THEXRA ENTERPRISE SOLUTION PROPOSAL</h1>
           <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">Architecture Recommendation Brief</p>
@@ -580,7 +622,7 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         </div>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 20px; font-size: 13px; line-height: 1.6; color: #334155;">
+      <div style="display: flex; flex-direction: column; gap: 16px; font-size: 13px; line-height: 1.5; color: #334155;">
         <div>
           <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">1. Client Problem Statement</strong>
           <p style="margin: 0;">${cleanText(data.businessProblem)}</p>
@@ -594,20 +636,35 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         <div>
           <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">3. Proposed Solution Concept</strong>
           <p style="margin: 0;">${cleanText(data.solutionConcept)}</p>
+          
+          ${data.implementationApproach && data.implementationApproach.length > 0 ? `
+            <div style="margin-top: 8px;">
+              <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Implementation Approach:</strong>
+              <ol style="margin: 0; padding-left: 18px; color: #334155; font-size: 12px; line-height: 1.4;">
+                ${data.implementationApproach.map(step => `<li style="margin-bottom: 2px;">${cleanText(step)}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+
+          ${data.implementationPlan ? `
+            <div style="margin-top: 8px;">
+              <strong style="font-size: 11px; text-transform: uppercase; color: #0284C7; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Detailed Implementation Plan:</strong>
+              ${renderImplementationPlan(data.implementationPlan, true)}
+            </div>
+          ` : ''}
         </div>
 
-        <div style="background: #f8fafc; padding: 16px; border-radius: 6px; border-left: 4px solid #2563eb;">
+        <div style="background: #f8fafc; padding: 14px; border-radius: 6px; border-left: 4px solid #2563eb;">
           <strong style="font-size: 11px; text-transform: uppercase; color: #0f172a; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Architecture Blueprint</strong>
-          <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #0f172a;">${cleanText(data.recommendedTechnology)}</h3>
+          <h3 style="margin: 0 0 8px 0; font-size: 15px; color: #0f172a;">${cleanText(data.recommendedTechnology)}</h3>
 
-          <!-- Visual System Diagram Flow (Proposal Light Mode) -->
-          <div style="margin: 10px 0; padding: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-            <strong style="font-size: 10px; text-transform: uppercase; color: #2563eb; display: block; margin-bottom: 6px;">Automated System Flow Diagram:</strong>
+          <div style="margin: 8px 0; padding: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <strong style="font-size: 10px; text-transform: uppercase; color: #2563eb; display: block; margin-bottom: 4px;">Automated System Flow Diagram:</strong>
             ${renderArchitectureDiagram(data.solutionArchitecture, true)}
           </div>
 
           ${data.solutionArchitecture ? `
-            <div style="font-size: 12px; color: #334155; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 12px; color: #334155; display: flex; flex-direction: column; gap: 4px;">
               <p style="margin:0;"><strong>1. Overview:</strong> ${cleanText(data.solutionArchitecture.solutionOverview)}</p>
               <p style="margin:0;"><strong>2. User Journey:</strong> ${cleanText(data.solutionArchitecture.userJourney)}</p>
               <p style="margin:0;"><strong>3. Hardware:</strong> ${(data.solutionArchitecture.hardware || []).join(', ')}</p>
@@ -617,19 +674,19 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
               <p style="margin:0;"><strong>7. Backend:</strong> ${(data.solutionArchitecture.backend || []).join(', ')}</p>
               <p style="margin:0;"><strong>8. Dashboard:</strong> ${(data.solutionArchitecture.dashboard || []).join(', ')}</p>
               <p style="margin:0;"><strong>9. Data Flow:</strong> ${cleanText(data.solutionArchitecture.dataFlow)}</p>
-              <p style="margin: 4px 0 0 0; color: #64748b; font-size: 11.5px;"><strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
+              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 11.5px;"><strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
             </div>
           ` : ''}
         </div>
 
         <div>
           <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">5. Expected Business Outcomes</strong>
-          <p style="margin: 0; color: #334155; font-size: 13px; line-height: 1.6;">${cleanText(data.expectedBenefits)}</p>
+          <p style="margin: 0; color: #334155; font-size: 12.5px; line-height: 1.5;">${cleanText(data.expectedBenefits)}</p>
         </div>
 
         <div>
           <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">6. Implementation Next Steps</strong>
-          <p style="margin: 0; color: #334155; font-size: 13px; line-height: 1.6;">${cleanText(data.recommendedNextStep || data.nextStep)}</p>
+          <p style="margin: 0; color: #334155; font-size: 12.5px; line-height: 1.5;">${cleanText(data.recommendedNextStep || data.nextStep)}</p>
         </div>
       </div>
     `;
@@ -637,7 +694,6 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         modal.style.display = 'block';
       });
 
-      // Modal button controls
       document.getElementById('btn-modal-close')?.addEventListener('click', () => {
         document.getElementById('proposalModal').style.display = 'none';
       });
@@ -654,10 +710,8 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
 
     if (statusBanner) {
       statusBanner.className = 'status-banner error';
-
       const errString = (err.message || '').toLowerCase();
 
-      // Check specific error types and map to clean user-friendly messages
       if (errString.includes('503') || errString.includes('demand') || errString.includes('busy')) {
         statusBanner.innerText = "Our AI is currently experiencing high demand. Please wait a moment and try submitting again.";
       } else if (errString.includes('429') || errString.includes('quota') || errString.includes('limit')) {
