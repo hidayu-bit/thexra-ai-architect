@@ -92,3 +92,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Support Phase Formatting & Spacing:** Standardized the 7th stage duration formatting (`Support (Ongoing): `) with proper inline spacing and colon alignment to maintain uniform visual consistency across all deliverables.
 - **Syntax Bug Fixes & Code Clean-Up:** Fixed a broken ternary condition in `renderArchitectureDiagram` and ensured all template literals and card container tags close correctly.
 - **Multi-Timeline Validation Dataset:** Created concise intake test cases across Manufacturing, Healthcare, and Energy verticals tailored for 1-3, 3-6, and 6-12 month timelines to validate AI duration scaling and scoping logic.
+  
+## Day 14 — Scope of Work (SOW) Generator
+- **10-Field Schema & Prompt Integration:** Updated `callGeminiWithRetry` JSON schema and prompt rules to enforce solution-specific contractual details (`projectScope`, `features`, `deliverables`, `hardware`, `software`, `content`, `training`, `deployment`, `support`, `exclusions`).
+- **Responsive SOW Grid Renderer:** Implemented `renderScopeOfWork` UI helper to format all 10 fields into structured, responsive grid cards across the main panel and modal views.
+- **Document Export & Preview Integration:** Linked complete SOW outputs into Word document downloads (`btn-save`) and live proposal previews (`btn-proposal`).
+- **Multi-Scenario Validation:** Tested across Manufacturing, VR Simulation, Digital Twin, and Retail Kiosk intake datasets to confirm 100% solution-specific outputs without generic filler text.

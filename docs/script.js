@@ -29,7 +29,7 @@ loadKnowledgeBases();
 import { GoogleGenAI } from '@google/genai';
 
 // 1. Initialize Gemini API Client
-const GEMINI_API_KEY = "GEMINI_API_KEY";
+const GEMINI_API_KEY = "GEMINIAPIKEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 /**
@@ -108,6 +108,48 @@ function renderImplementationPlan(planData, isProposal = false) {
   `;
 }
 
+// Helper to render Scope of Work (SOW) 10-field layout
+function renderScopeOfWork(sow, isProposal = false) {
+  if (!sow) return '';
+
+  const formatList = (arr) =>
+    Array.isArray(arr) && arr.length
+      ? `<ul style="margin: 2px 0 0 0; padding-left: 16px; font-size: 11.5px; color: ${isProposal ? '#334155' : '#CBD5E1'};">${arr.map(item => `<li>${cleanText(item)}</li>`).join('')}</ul>`
+      : '<span style="font-size: 11px; color: #94A3B8;">N/A</span>';
+
+  const titleColor = isProposal ? '#0F172A' : '#FFFFFF';
+  const labelColor = isProposal ? '#2563EB' : '#38BDF8';
+  const cardBg = isProposal ? '#F8FAFC' : 'rgba(255, 255, 255, 0.05)';
+  const border = isProposal ? '#E2E8F0' : 'rgba(255, 255, 255, 0.1)';
+
+  return `
+    <div style="margin-top: 10px; padding: 12px; background: ${cardBg}; border: 1px solid ${border}; border-radius: 6px;">
+      <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: ${titleColor}; text-transform: uppercase; letter-spacing: 0.05em;">Scope of Work (SOW)</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+        <div style="grid-column: 1 / -1;">
+          <strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">1. Project Scope</strong>
+          <span style="font-size: 12px; color: ${isProposal ? '#334155' : '#CBD5E1'};">${cleanText(sow.projectScope)}</span>
+        </div>
+
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">2. Core Features</strong>${formatList(sow.features)}</div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">3. Deliverables</strong>${formatList(sow.deliverables)}</div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">4. Hardware Requirements</strong>${formatList(sow.hardware)}</div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">5. Software Modules</strong>${formatList(sow.software)}</div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">6. Content Assets</strong>${formatList(sow.content)}</div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">7. Training Plan</strong><span style="font-size: 11.5px; color: ${isProposal ? '#334155' : '#CBD5E1'};">${cleanText(sow.training)}</span></div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">8. Deployment Strategy</strong><span style="font-size: 11.5px; color: ${isProposal ? '#334155' : '#CBD5E1'};">${cleanText(sow.deployment)}</span></div>
+        <div><strong style="color: ${labelColor}; font-size: 10.5px; text-transform: uppercase; display: block;">9. Ongoing Support</strong><span style="font-size: 11.5px; color: ${isProposal ? '#334155' : '#CBD5E1'};">${cleanText(sow.support)}</span></div>
+
+        <div style="grid-column: 1 / -1; border-top: 1px dashed ${border}; padding-top: 6px;">
+          <strong style="color: #F87171; font-size: 10.5px; text-transform: uppercase; display: block;">10. Exclusions (Out of Scope)</strong>
+          ${formatList(sow.exclusions)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // 2. DOM Elements
 const intakeForm = document.getElementById('intake-form');
 const statusBanner = document.getElementById('form-status');
@@ -171,6 +213,22 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
                   },
                   required: ["stage", "duration", "deliverables"]
                 }
+              },
+              scopeOfWork: {
+                type: "OBJECT",
+                properties: {
+                  projectScope: { type: "STRING" },
+                  features: { type: "ARRAY", items: { type: "STRING" } },
+                  deliverables: { type: "ARRAY", items: { type: "STRING" } },
+                  hardware: { type: "ARRAY", items: { type: "STRING" } },
+                  software: { type: "ARRAY", items: { type: "STRING" } },
+                  content: { type: "ARRAY", items: { type: "STRING" } },
+                  training: { type: "STRING" },
+                  deployment: { type: "STRING" },
+                  support: { type: "STRING" },
+                  exclusions: { type: "ARRAY", items: { type: "STRING" } }
+                },
+                required: ["projectScope", "features", "deliverables", "hardware", "software", "content", "training", "deployment", "support", "exclusions"]
               }
             },
             required: [
@@ -187,7 +245,8 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
               "limitations",
               "solutionArchitecture",
               "implementationApproach",
-              "implementationPlan"
+              "implementationPlan",
+              "scopeOfWork"
             ]
           }
         }
@@ -333,7 +392,8 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
    - Durations MUST be formatted cleanly (e.g., "1 week", "1.5 weeks", "2 weeks", "Ongoing").
    - Deliverables MUST be straightforward, non-jargon, clear business items that anyone can easily understand.
    - Cumulative time across stages 1 to 6 MUST strictly fit the selected timeline (${timeline}).
-4. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
+4. "scopeOfWork": MUST provide highly specific, non-generic details tailored strictly to the client's problem, industry, and recommended THEXRA solution. Never use generic filler.
+5. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
 
 {
   "businessProblem": "Summarize client problem",
@@ -366,7 +426,19 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
     { "stage": "Testing", "duration": "1.5 weeks", "deliverables": ["Cross-device QA", "Performance benchmark"] },
     { "stage": "Deployment", "duration": "1.5 weeks", "deliverables": ["Production release", "Telemetry verification"] },
     { "stage": "Support", "duration": "Ongoing", "deliverables": ["SLA maintenance", "Monthly analytics report"] }
-  ]
+  ],
+  "scopeOfWork": {
+    "projectScope": "Brief summary of boundaries matching the solution",
+    "features": ["Specific feature 1", "Specific feature 2"],
+    "deliverables": ["Deliverable 1", "Deliverable 2"],
+    "hardware": ["Hardware 1", "Hardware 2"],
+    "software": ["Software 1", "Software 2"],
+    "content": ["Content asset 1", "Content asset 2"],
+    "training": "Specific training approach",
+    "deployment": "Rollout method",
+    "support": "SLA & ongoing terms",
+    "exclusions": ["Out-of-scope item 1", "Out-of-scope item 2"]
+  }
 }`;
 
   try {
@@ -427,6 +499,9 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
               ${renderImplementationPlan(data.implementationPlan, false)}
             </div>
           ` : ''}
+
+          <!-- Scope of Work (SOW) Output in Main Panel -->
+          ${renderScopeOfWork(data.scopeOfWork, false)}
         </div>
 
         <!-- 4. Technology Architecture (9 Modules) -->
@@ -531,7 +606,7 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         intakeForm.scrollIntoView({ behavior: 'smooth' });
       });
 
-      // Save Solution (Export Word doc)
+      // Save Solution (Export Word doc including SOW)
       document.getElementById('btn-save')?.addEventListener('click', () => {
         if (!currentBriefData) {
           alert('Please generate a solution brief first before saving.');
@@ -539,6 +614,7 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         }
 
         const data = currentBriefData;
+        const sow = data.scopeOfWork;
 
         const htmlDoc = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -567,6 +643,20 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
 
         <h2>3. Proposed Solution Concept</h2>
         <p>${cleanText(data.solutionConcept)}</p>
+
+        ${sow ? `
+          <h2>Scope of Work (SOW)</h2>
+          <p><strong>Project Scope:</strong> ${cleanText(sow.projectScope)}</p>
+          <p><strong>Features:</strong> ${(sow.features || []).join(', ')}</p>
+          <p><strong>Deliverables:</strong> ${(sow.deliverables || []).join(', ')}</p>
+          <p><strong>Hardware:</strong> ${(sow.hardware || []).join(', ')}</p>
+          <p><strong>Software:</strong> ${(sow.software || []).join(', ')}</p>
+          <p><strong>Content:</strong> ${(sow.content || []).join(', ')}</p>
+          <p><strong>Training:</strong> ${cleanText(sow.training)}</p>
+          <p><strong>Deployment:</strong> ${cleanText(sow.deployment)}</p>
+          <p><strong>Support:</strong> ${cleanText(sow.support)}</p>
+          <p><strong>Exclusions:</strong> ${(sow.exclusions || []).join(', ')}</p>
+        ` : ''}
 
         <div class="tech-box">
           <h2 style="margin-top:0; color:#0f172a;">4. Technology Architecture Blueprint</h2>
@@ -652,6 +742,9 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
               ${renderImplementationPlan(data.implementationPlan, true)}
             </div>
           ` : ''}
+
+          <!-- Scope of Work (SOW) Output in Modal Proposal -->
+          ${renderScopeOfWork(data.scopeOfWork, true)}
         </div>
 
         <div style="background: #f8fafc; padding: 14px; border-radius: 6px; border-left: 4px solid #2563eb;">
