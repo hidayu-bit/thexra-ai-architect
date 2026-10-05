@@ -32,9 +32,7 @@ import { GoogleGenAI } from '@google/genai';
 const GEMINI_API_KEY = "GEMINIAPIKEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-/**
- * Helper to generate a visual architecture flowchart from solution architecture data
- */
+//Helper to generate a visual architecture flowchart from solution architecture data
 function renderArchitectureDiagram(architectureData, isProposal = false) {
   if (!architectureData) return '';
 
@@ -616,74 +614,80 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         const data = currentBriefData;
         const sow = data.scopeOfWork;
 
+        // Updated btn-save HTML string template
         const htmlDoc = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head>
-        <meta charset="utf-8">
-        <title>THEXRA Solution Brief</title>
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #1e293b; }
-          h1 { color: #0f172a; border-bottom: 2px solid #0f172a; padding-bottom: 8px; font-size: 18pt; }
-          h2 { color: #2563eb; font-size: 12pt; text-transform: uppercase; margin-top: 18pt; margin-bottom: 4pt; }
-          p, li { font-size: 11pt; line-height: 1.5; color: #334155; }
-          .tech-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 12px; margin: 10pt 0; }
-        </style>
-      </head>
-      <body>
-        <h1>THEXRA ENTERPRISE SOLUTION BRIEF</h1>
-        <p><strong>Date:</strong> ${new Date().toLocaleDateString()} | <strong>Status:</strong> Approved Architecture Brief</p>
-        
-        <h2>1. Client Problem Statement</h2>
-        <p>${cleanText(data.businessProblem)}</p>
-        <p><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'N/A')}</p>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+  <meta charset="utf-8">
+  <title>THEXRA Solution Brief</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #1e293b; }
+    h1 { color: #0f172a; border-bottom: 2px solid #0f172a; padding-bottom: 8px; font-size: 18pt; }
+    h2 { color: #2563eb; font-size: 12pt; text-transform: uppercase; margin-top: 18pt; margin-bottom: 4pt; }
+    p, li { font-size: 11pt; line-height: 1.5; color: #334155; }
+    .tech-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 12px; margin: 10pt 0; }
+  </style>
+</head>
+<body>
+  <h1>THEXRA ENTERPRISE SOLUTION BRIEF</h1>
+  <p><strong>Date:</strong> ${new Date().toLocaleDateString()} | <strong>Status:</strong> Approved Architecture Brief</p>
+  
+  <h2>1. Client Problem Statement</h2>
+  <p>${cleanText(data.businessProblem)}</p>
+  <p><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'N/A')}</p>
 
-        <h2>2. AI Rationale & Analysis</h2>
-        <p><em>"${cleanText(data.why)}"</em></p>
-        ${data.limitations && data.limitations.length > 0 ? `<p><strong>Constraints:</strong> ${data.limitations.map(l => cleanText(l)).join(', ')}</p>` : ''}
+  <h2>2. AI Rationale & Analysis</h2>
+  <p><em>"${cleanText(data.why)}"</em></p>
+  ${data.limitations && data.limitations.length > 0 ? `<p><strong>Constraints:</strong> ${data.limitations.map(l => cleanText(l)).join(', ')}</p>` : ''}
 
-        <h2>3. Proposed Solution Concept</h2>
-        <p>${cleanText(data.solutionConcept)}</p>
+<h2>3. Proposed Solution Concept</h2>
+<p>${cleanText(data.solutionConcept)}</p>
 
-        ${sow ? `
-          <h2>Scope of Work (SOW)</h2>
-          <p><strong>Project Scope:</strong> ${cleanText(sow.projectScope)}</p>
-          <p><strong>Features:</strong> ${(sow.features || []).join(', ')}</p>
-          <p><strong>Deliverables:</strong> ${(sow.deliverables || []).join(', ')}</p>
-          <p><strong>Hardware:</strong> ${(sow.hardware || []).join(', ')}</p>
-          <p><strong>Software:</strong> ${(sow.software || []).join(', ')}</p>
-          <p><strong>Content:</strong> ${(sow.content || []).join(', ')}</p>
-          <p><strong>Training:</strong> ${cleanText(sow.training)}</p>
-          <p><strong>Deployment:</strong> ${cleanText(sow.deployment)}</p>
-          <p><strong>Support:</strong> ${cleanText(sow.support)}</p>
-          <p><strong>Exclusions:</strong> ${(sow.exclusions || []).join(', ')}</p>
-        ` : ''}
+${data.implementationPlan ? `
+  <h2>Detailed Implementation Roadmap (7 Stages)</h2>
+  ${renderImplementationPlan(data.implementationPlan, true)}
+` : ''}
 
-        <div class="tech-box">
-          <h2 style="margin-top:0; color:#0f172a;">4. Technology Architecture Blueprint</h2>
-          <p style="font-size:14pt; font-weight:bold; color:#0f172a;">${cleanText(data.recommendedTechnology)}</p>
-          ${data.solutionArchitecture ? `
-            <p><strong>1. Solution Overview:</strong> ${cleanText(data.solutionArchitecture.solutionOverview)}</p>
-            <p><strong>2. User Journey:</strong> ${cleanText(data.solutionArchitecture.userJourney)}</p>
-            <p><strong>3. Hardware:</strong> ${(data.solutionArchitecture.hardware || []).join(', ')}</p>
-            <p><strong>4. Software:</strong> ${(data.solutionArchitecture.software || []).join(', ')}</p>
-            <p><strong>5. AI Components:</strong> ${(data.solutionArchitecture.aiComponents || []).join(', ')}</p>
-            <p><strong>6. XR Components:</strong> ${(data.solutionArchitecture.xrComponents || []).join(', ')}</p>
-            <p><strong>7. Backend:</strong> ${(data.solutionArchitecture.backend || []).join(', ')}</p>
-            <p><strong>8. Dashboard:</strong> ${(data.solutionArchitecture.dashboard || []).join(', ')}</p>
-            <p><strong>9. Data Flow:</strong> ${cleanText(data.solutionArchitecture.dataFlow)}</p>
-            <p><strong>Alternative Technology:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
-          ` : ''}
-        </div>
+${sow ? `
+  <h2>Scope of Work (SOW)</h2>
+  <p><strong>Project Scope:</strong> ${cleanText(sow.projectScope)}</p>
+  <p><strong>Features:</strong> ${(sow.features || []).join(', ')}</p>
+  <p><strong>Deliverables:</strong> ${(sow.deliverables || []).join(', ')}</p>
+  <p><strong>Hardware:</strong> ${(sow.hardware || []).join(', ')}</p>
+  <p><strong>Software:</strong> ${(sow.software || []).join(', ')}</p>
+  <p><strong>Content:</strong> ${(sow.content || []).join(', ')}</p>
+  <p><strong>Training:</strong> ${cleanText(sow.training)}</p>
+  <p><strong>Deployment:</strong> ${cleanText(sow.deployment)}</p>
+  <p><strong>Support:</strong> ${cleanText(sow.support)}</p>
+  <p><strong>Exclusions:</strong> ${(sow.exclusions || []).join(', ')}</p>
+` : ''}
 
-        <h2>5. Expected Business Outcomes & KPIs</h2>
-        <p>${cleanText(data.expectedBenefits)}</p>
-        <p><strong>KPI Alignment:</strong> ${cleanText(data.clientObjective || 'N/A')}</p>
+  <div class="tech-box">
+    <h2 style="margin-top:0; color:#0f172a;">4. Technology Architecture Blueprint</h2>
+    <p style="font-size:14pt; font-weight:bold; color:#0f172a;">${cleanText(data.recommendedTechnology)}</p>
+    ${data.solutionArchitecture ? `
+      <p><strong>1. Solution Overview:</strong> ${cleanText(data.solutionArchitecture.solutionOverview)}</p>
+      <p><strong>2. User Journey:</strong> ${cleanText(data.solutionArchitecture.userJourney)}</p>
+      <p><strong>3. Hardware:</strong> ${(data.solutionArchitecture.hardware || []).join(', ')}</p>
+      <p><strong>4. Software:</strong> ${(data.solutionArchitecture.software || []).join(', ')}</p>
+      <p><strong>5. AI Components:</strong> ${(data.solutionArchitecture.aiComponents || []).join(', ')}</p>
+      <p><strong>6. XR Components:</strong> ${(data.solutionArchitecture.xrComponents || []).join(', ')}</p>
+      <p><strong>7. Backend:</strong> ${(data.solutionArchitecture.backend || []).join(', ')}</p>
+      <p><strong>8. Dashboard:</strong> ${(data.solutionArchitecture.dashboard || []).join(', ')}</p>
+      <p><strong>9. Data Flow:</strong> ${cleanText(data.solutionArchitecture.dataFlow)}</p>
+      <p><strong>Alternative Technology:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
+    ` : ''}
+  </div>
 
-        <h2>6. Recommended Next Steps</h2>
-        <p>${cleanText(data.recommendedNextStep || data.nextStep)}</p>
-      </body>
-      </html>
-    `;
+  <h2>5. Expected Business Outcomes & KPIs</h2>
+  <p>${cleanText(data.expectedBenefits)}</p>
+  <p><strong>KPI Alignment:</strong> ${cleanText(data.clientObjective || 'N/A')}</p>
+
+  <h2>6. Recommended Next Steps</h2>
+  <p>${cleanText(data.recommendedNextStep || data.nextStep)}</p>
+</body>
+</html>
+`;
 
         const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
         const link = document.createElement('a');
