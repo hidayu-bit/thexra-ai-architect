@@ -444,10 +444,10 @@ button[type="submit"]:disabled {
     padding: 8px 10px !important;
 }
 
-/* Printable PDF Export Optimization */
+/* Printable PDF Export Optimixation */
 @media print {
 
-    /* 1. Hide background UI and scrollbars */
+    /*1. Hide background UI and scrollbars */
     body {
         background: #ffffff !important;
         color: #0f172a !important;
@@ -459,7 +459,7 @@ button[type="submit"]:disabled {
         visibility: hidden;
     }
 
-    /* 2. Show only proposal content and force full page width */
+    /*2. Show only proposal content and force full page width */
     #proposalModal,
     #proposalContent,
     #proposalContent * {
@@ -488,16 +488,32 @@ button[type="submit"]:disabled {
         box-sizing: border-box !important;
     }
 
-    /* 3. Fix the System Flow Diagram in PDF view */
+    /*3. Fix System Flow Diagram in PDF view */
     #proposalContent div[style*="overflow-x"] {
         overflow: visible !important;
     }
 
     /* Ensure node cards scale cleanly across printable page width */
-    #proposalContent div[style*="display: flex"] {
+    #proposalContent div[style*="display: flex"]{
         width: 100% !important;
         justify-content: space-between !important;
     }
+
+    /*4. Page break & clean borders for 13 sections proposal template */
+    .proposal-template-grid {
+        gap: 12px !important;
+    }
+
+    .proposal-section {
+        box-shadow: none !important;
+        border: 1px solid #CBD5E1 !important;
+        page-break-inside: avoid !important;
+    }
+
+    .section-label {
+        color: #0F172A !important;
+    }
+
 }
 
 html {

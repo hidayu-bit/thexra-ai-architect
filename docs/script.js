@@ -29,7 +29,7 @@ loadKnowledgeBases();
 import { GoogleGenAI } from '@google/genai';
 
 // 1. Initialize Gemini API Client
-const GEMINI_API_KEY = "GEMINIAPIKEY";
+const GEMINI_API_KEY = "GEMINIPAPIKEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 //Helper to generate a visual architecture flowchart from solution architecture data
@@ -704,88 +704,139 @@ ${sow ? `
 
         if (!modal || !content) return;
 
+        const data = currentBriefData || {};
+        const sow = data.scopeOfWork || {};
+        const arch = data.solutionArchitecture || {};
+
         content.innerHTML = `
-      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="border-bottom: 2px solid #0F172A; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
-          <h1 style="margin: 0; font-size: 20px; color: #0f172a; font-weight: 700;">THEXRA ENTERPRISE SOLUTION PROPOSAL</h1>
-          <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">Architecture Recommendation Brief</p>
+        <h1 style="margin: 0; font-size: 22px; color: #0F172A; font-weight: 700; letter-spacing: -0.02em;">THEXRA ENTERPRISE SOLUTION PROPOSAL</h1>
+        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748B;" font-weight: 600;">13-Section Formal AI Solution Brief</p>
         </div>
-        <div style="text-align: right; font-size: 11px; color: #64748b;">
-          <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
-          <strong>Status:</strong> Draft
+        <div style="text-align: right; font-size: 11px; color: #64748B;">
+        <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
+        <strong>Status:</strong> Proposal Template
         </div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 16px; font-size: 13px; line-height: 1.5; color: #334155;">
-        <div>
-          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">1. Client Problem Statement</strong>
-          <p style="margin: 0;">${cleanText(data.businessProblem)}</p>
         </div>
 
-        <div>
-          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">2. AI Rationale & Analysis</strong>
-          <p style="margin: 0; font-style: italic; color: #475569;">"${cleanText(data.why)}"</p>
+        <div class="proposal-template-grid" style="display: flex; flex-direction: column; gap: 18px; font-size: 13px; line-height: 1.5; color: #334155;">
+
+        <!-- Section 1: Executive Summary -->
+        <div class="proposal-section">
+        <strong class="section-label">1. Executive Summary</strong>
+        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #2563EB; padding: 8px 12px; border-radius: 4px; color: #475569; font-style: italic;">
+        [Template Placeholder]: Executive summary pitch highlighting strategic impact, solution fit, and high-level ROI for ${cleanText(document.getElementById('companyName')?.value || 'Client')}. </p>
         </div>
 
-        <div>
-          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">3. Proposed Solution Concept</strong>
-          <p style="margin: 0;">${cleanText(data.solutionConcept)}</p>
-          
-          ${data.implementationApproach && data.implementationApproach.length > 0 ? `
-            <div style="margin-top: 8px;">
-              <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Implementation Approach:</strong>
-              <ol style="margin: 0; padding-left: 18px; color: #334155; font-size: 12px; line-height: 1.4;">
-                ${data.implementationApproach.map(step => `<li style="margin-bottom: 2px;">${cleanText(step)}</li>`).join('')}
-              </ol>
-            </div>
-          ` : ''}
-
-          ${data.implementationPlan ? `
-            <div style="margin-top: 8px;">
-              <strong style="font-size: 11px; text-transform: uppercase; color: #0284C7; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Detailed Implementation Plan:</strong>
-              ${renderImplementationPlan(data.implementationPlan, true)}
-            </div>
-          ` : ''}
-
-          <!-- Scope of Work (SOW) Output in Modal Proposal -->
-          ${renderScopeOfWork(data.scopeOfWork, true)}
+        <!-- Section 2: Client Challenge -->
+        <div class="proposal-section">
+        <strong class="section-label">2. Client Challenge</strong>
+        <p style="margin: 0;">${cleanText(data.businessProblem || 'Core operational bottleneck specified during discovery.')}</p>
         </div>
 
-        <div style="background: #f8fafc; padding: 14px; border-radius: 6px; border-left: 4px solid #2563eb;">
-          <strong style="font-size: 11px; text-transform: uppercase; color: #0f172a; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Architecture Blueprint</strong>
-          <h3 style="margin: 0 0 8px 0; font-size: 15px; color: #0f172a;">${cleanText(data.recommendedTechnology)}</h3>
+        <!-- Section 3: Project Objective -->
+        <div class="proposal-section">
+        <strong class="section-label">3. Project Objective</strong>
+        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #0284C7; padding: 8px 12px; border-radius: 4px; color: #475569;">
+        <strong>Target KPIs:</strong> ${cleanText(data.clientObjective || 'KPI target defined during intake.')}<br>
+        <span style="font-size: 11.5px; color: 64748B;">[Template Placeholder]: Primary business benchmarks, quantitative metrics, and adoption goals.</span>
+        </p>
+        </div>
 
-          <div style="margin: 8px 0; padding: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-            <strong style="font-size: 10px; text-transform: uppercase; color: #2563eb; display: block; margin-bottom: 4px;">Automated System Flow Diagram:</strong>
-            ${renderArchitectureDiagram(data.solutionArchitecture, true)}
+        <!-- Section 4: Proposed Solution -->
+      <div class="proposal-section">
+        <strong class="section-label">4. Proposed Solution</strong>
+        <p style="margin: 0;">${cleanText(data.solutionConcept || 'Recommended solution architecture concept.')}</p>
+        ${data.implementationApproach && data.implementationApproach.length > 0 ? `
+          <div style="margin-top: 6px;">
+            <strong style="font-size: 11px; text-transform: uppercase; color: #2563EB;">Implementation Phasing:</strong>
+            <ol style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
+              ${data.implementationApproach.map(step => `<li>${cleanText(step)}</li>`).join('')}
+            </ol>
           </div>
+        ` : ''}
+      </div>
 
-          ${data.solutionArchitecture ? `
-            <div style="font-size: 12px; color: #334155; display: flex; flex-direction: column; gap: 4px;">
-              <p style="margin:0;"><strong>1. Overview:</strong> ${cleanText(data.solutionArchitecture.solutionOverview)}</p>
-              <p style="margin:0;"><strong>2. User Journey:</strong> ${cleanText(data.solutionArchitecture.userJourney)}</p>
-              <p style="margin:0;"><strong>3. Hardware:</strong> ${(data.solutionArchitecture.hardware || []).join(', ')}</p>
-              <p style="margin:0;"><strong>4. Software:</strong> ${(data.solutionArchitecture.software || []).join(', ')}</p>
-              <p style="margin:0;"><strong>5. AI Components:</strong> ${(data.solutionArchitecture.aiComponents || []).join(', ')}</p>
-              <p style="margin:0;"><strong>6. XR Components:</strong> ${(data.solutionArchitecture.xrComponents || []).join(', ')}</p>
-              <p style="margin:0;"><strong>7. Backend:</strong> ${(data.solutionArchitecture.backend || []).join(', ')}</p>
-              <p style="margin:0;"><strong>8. Dashboard:</strong> ${(data.solutionArchitecture.dashboard || []).join(', ')}</p>
-              <p style="margin:0;"><strong>9. Data Flow:</strong> ${cleanText(data.solutionArchitecture.dataFlow)}</p>
-              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 11.5px;"><strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'N/A')}</p>
-            </div>
-          ` : ''}
+      <!-- Section 5: User Experience (SPLIT OUT FROM ARCHITECTURE) -->
+      <div class="proposal-section">
+        <strong class="section-label">5. User Experience & Journey</strong>
+        <p style="margin: 0;"><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'Primary Personas')}</p>
+        <p style="margin: 4px 0 0 0;"><strong>Workflow:</strong> ${cleanText(arch.userJourney || 'Detailed end-user operational journey across spatial interfaces.')}</p>
+      </div>
+
+      <!-- Section 6: Solution Architecture -->
+      <div class="proposal-section" style="background: #F8FAFC; padding: 14px; border-radius: 6px; border: 1px solid #E2E8F0;">
+        <strong class="section-label" style="color: #0F172A;">6. Solution Architecture</strong>
+        <h3 style="margin: 0 0 8px 0; font-size: 14.5px; color: #0F172A;">${cleanText(data.recommendedTechnology || 'THEXRA Enterprise Architecture')}</h3>
+
+        <div style="margin: 8px 0; padding: 8px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
+          <strong style="font-size: 10px; text-transform: uppercase; color: #2563EB; display: block; margin-bottom: 4px;">Automated System Flow Diagram:</strong>
+          ${renderArchitectureDiagram(arch, true)}
         </div>
 
-        <div>
-          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">5. Expected Business Outcomes</strong>
-          <p style="margin: 0; color: #334155; font-size: 12.5px; line-height: 1.5;">${cleanText(data.expectedBenefits)}</p>
-        </div>
-
-        <div>
-          <strong style="font-size: 11px; text-transform: uppercase; color: #2563eb; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">6. Implementation Next Steps</strong>
-          <p style="margin: 0; color: #334155; font-size: 12.5px; line-height: 1.5;">${cleanText(data.recommendedNextStep || data.nextStep)}</p>
+        <div style="font-size: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
+          <div><strong>Hardware:</strong> ${(arch.hardware || []).join(', ') || 'N/A'}</div>
+          <div><strong>Software:</strong> ${(arch.software || []).join(', ') || 'N/A'}</div>
+          <div><strong>AI Components:</strong> ${(arch.aiComponents || []).join(', ') || 'N/A'}</div>
+          <div><strong>XR Components:</strong> ${(arch.xrComponents || []).join(', ') || 'N/A'}</div>
+          <div><strong>Backend:</strong> ${(arch.backend || []).join(', ') || 'N/A'}</div>
+          <div><strong>Dashboard:</strong> ${(arch.dashboard || []).join(', ') || 'N/A'}</div>
+          <div style="grid-column: 1 / -1;"><strong>Data Flow:</strong> <code>${cleanText(arch.dataFlow || 'N/A')}</code></div>
         </div>
       </div>
+
+      <!-- Section 7: Scope of Work -->
+      <div class="proposal-section">
+        <strong class="section-label">7. Scope of Work (SOW)</strong>
+        <p style="margin: 0;"><strong>Project Scope:</strong> ${cleanText(sow.projectScope || 'Scope boundary statement.')}</p>
+        <p style="margin: 4px 0 0 0;"><strong>Core Features:</strong> ${(sow.features || []).join(', ') || 'N/A'}</p>
+        <p style="margin: 4px 0 0 0; color: #DC2626;"><strong>Exclusions:</strong> ${(sow.exclusions || []).join(', ') || 'N/A'}</p>
+      </div>
+
+      <!-- Section 8: Deliverables -->
+      <div class="proposal-section">
+        <strong class="section-label">8. Deliverables</strong>
+        <p style="margin: 0;">${(sow.deliverables || []).join(' • ') || 'Key technical and operational deliverables list.'}</p>
+      </div>
+
+      <!-- Section 9: Implementation Plan -->
+      <div class="proposal-section">
+        <strong class="section-label">9. Implementation Plan</strong>
+        ${data.implementationPlan ? renderImplementationPlan(data.implementationPlan, true) : '<p style="margin:0;">7-Stage Execution Roadmap</p>'}
+      </div>
+
+      <!-- Section 10: Timeline -->
+      <div class="proposal-section">
+        <strong class="section-label">10. Timeline & Delivery Target</strong>
+        <p style="margin: 0;"><strong>Target Horizon:</strong> ${cleanText(document.getElementById('timeline')?.value || '10 weeks')}</p>
+        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748B;">Includes discovery, design, development, acceptance testing, and on-site rollout.</p>
+      </div>
+
+      <!-- Section 11: Assumptions (NEW PLACEHOLDER) -->
+      <div class="proposal-section">
+        <strong class="section-label">11. Assumptions & Prerequisites</strong>
+        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #64748B; padding: 8px 12px; border-radius: 4px; color: #475569;">
+          [Day 16 Template Placeholder]: Key prerequisite technical access, client data provisioning, site network availability, and team resources.
+        </p>
+      </div>
+
+      <!-- Section 12: Optional Add-ons (NEW PLACEHOLDER) -->
+      <div class="proposal-section">
+        <strong class="section-label">12. Optional Add-ons & Phase 2 Upsells</strong>
+        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #9333EA; padding: 8px 12px; border-radius: 4px; color: #475569;">
+          <strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'Phase 2 Scale Recommendation')}<br>
+          <span style="font-size: 11.5px; color: #64748B;">[Day 16 Template Placeholder]: Optional maintenance extensions, advanced analytics upgrades, or additional spatial licenses.</span>
+        </p>
+      </div>
+
+      <!-- Section 13: Next Steps -->
+      <div class="proposal-section">
+        <strong class="section-label">13. Next Steps & Scoping Workshop</strong>
+        <p style="margin: 0;">${cleanText(data.recommendedNextStep || data.nextStep || 'Execute technical validation workshop and finalize SOW.')}</p>
+      </div>
+
+    </div>
     `;
 
         modal.style.display = 'block';
@@ -796,6 +847,7 @@ ${sow ? `
       });
 
       document.getElementById('btn-modal-print')?.addEventListener('click', () => {
+        e.preventDefault(); // Prevents form submission and page reload
         window.print();
       });
     }
