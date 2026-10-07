@@ -29,10 +29,10 @@ loadKnowledgeBases();
 import { GoogleGenAI } from '@google/genai';
 
 // 1. Initialize Gemini API Client
-const GEMINI_API_KEY = "GEMINIPAPIKEY";
+const GEMINI_API_KEY = "GEMINIAPIKEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-//Helper to generate a visual architecture flowchart from solution architecture data
+// Helper to generate a visual architecture flowchart from solution architecture data
 function renderArchitectureDiagram(architectureData, isProposal = false) {
   if (!architectureData) return '';
 
@@ -49,7 +49,7 @@ function renderArchitectureDiagram(architectureData, isProposal = false) {
     { label: 'Step 2: Experience', val: xr, color: '#38BDF8', border: isProposal ? '#38BDF8' : 'rgba(56, 189, 248, 0.3)' },
     { label: 'Step 3: App & AI', val: `${sw} (${aiComponents})`, color: isProposal ? '#9333EA' : '#C084FC', border: isProposal ? '#C084FC' : 'rgba(192, 132, 252, 0.3)' },
     { label: 'Step 4: Cloud & DB', val: backend, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' },
-    { label: 'Step 5: Dashboard', val: dash, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' }
+    { label: 'Step 5: Dashboard', val: dash, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#059669' : '#34D399' }
   ];
 
   const cardBg = isProposal ? '#FFFFFF' : 'rgba(255, 255, 255, 0.05)';
@@ -153,9 +153,9 @@ const intakeForm = document.getElementById('intake-form');
 const statusBanner = document.getElementById('form-status');
 const briefOutput = document.getElementById('aiOutput');
 
-// 3. Helper function to call gemini-3.8-flash with automatic retries
-async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
-  let delay = 3000;
+// 3. Helper function to call gemini-3.8-flash with automatic retries and low-latency configuration
+async function callGeminiWithRetry(systemPrompt, maxRetries = 2) {
+  let delay = 500;
 
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -164,6 +164,8 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
         contents: systemPrompt,
         config: {
           responseMimeType: "application/json",
+          temperature: 0.1,
+          maxOutputTokens: 2048,
           responseSchema: {
             type: "OBJECT",
             properties: {
@@ -256,7 +258,7 @@ async function callGeminiWithRetry(systemPrompt, maxRetries = 4) {
       if (isRateLimited && i < maxRetries - 1) {
         console.warn(`Server busy. Retrying in ${delay / 1000}s...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
-        delay *= 2;
+        delay += 500;
       } else {
         throw err;
       }
@@ -383,65 +385,20 @@ ALLOWED CATEGORIES:
 AR, VR, MR, AI, Digital Twin, Simulator, Interactive Display, Location-Based Experience, Mobile/Web, Combination solution
 
 CRITICAL FORMAT RULES:
-1. "recommendedTechnology": Best-fit category. MUST use exact THEXRA product names from tech knowledge base (
-${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent products.
+1. "recommendedTechnology": Best-fit category. MUST use exact THEXRA product names from tech knowledge base (${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent products.
 2. "why": Exactly 2 concise sentences: (1) Why tech category solves ${problem}, (2) Why THEXRA suits ${companyName}.
 3. "implementationPlan": MUST contain exactly 7 sequential stages: Discovery, Design, Prototype, Development, Testing, Deployment, Support. 
    - Durations MUST be formatted cleanly (e.g., "1 week", "1.5 weeks", "2 weeks", "Ongoing").
    - Deliverables MUST be straightforward, non-jargon, clear business items that anyone can easily understand.
    - Cumulative time across stages 1 to 6 MUST strictly fit the selected timeline (${timeline}).
 4. "scopeOfWork": MUST provide highly specific, non-generic details tailored strictly to the client's problem, industry, and recommended THEXRA solution. Never use generic filler.
-5. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
-
-{
-  "businessProblem": "Summarize client problem",
-  "clientObjective": "Summarize goal & KPI",
-  "recommendedTechnology": "Category — THEXRA Product Name",
-  "solutionConcept": "High-level architectural concept",
-  "targetUsers": "Primary user personas",
-  "expectedBenefits": "Key quantitative operational gains",
-  "complexity": "Low | Medium | High",
-  "recommendedNextStep": "Immediate technical scoping action",
-  "alternativeRecommendation": "Category — THEXRA Product Name",
-  "why": "Two concise sentences of architectural reasoning addressing this client.",
-  "solutionArchitecture": {
-    "solutionOverview": "Concise 2-3 sentence technical overview",
-    "userJourney": "Step-by-step user workflow",
-    "hardware": ["Hardware Item 1", "Hardware Item 2"],
-    "software": ["Software Item 1", "Software Item 2"],
-    "aiComponents": ["AI/ML Feature 1", "AI/ML Feature 2"],
-    "xrComponents": ["XR/Spatial Feature 1", "XR/Spatial Feature 2"],
-    "backend": ["Backend Infra 1", "Database/Protocol 2"],
-    "dashboard": ["Admin/UI Module 1", "Analytics Module 2"],
-    "dataFlow": "Device -> Edge -> Cloud -> Display"
-  },
-  "implementationApproach": ["Phase 1 description", "Phase 2 description", "Phase 3 description"],
-  "implementationPlan": [
-    { "stage": "Discovery", "duration": "1 week", "deliverables": ["Audit report", "Technical specs"] },
-    { "stage": "Design", "duration": "1.5 weeks", "deliverables": ["UI mockups", "Spatial standards"] },
-    { "stage": "Prototype", "duration": "1.5 weeks", "deliverables": ["Working prototype", "Validation report"] },
-    { "stage": "Development", "duration": "3 weeks", "deliverables": ["Core feature build", "Backend sync setup"] },
-    { "stage": "Testing", "duration": "1.5 weeks", "deliverables": ["Cross-device QA", "Performance benchmark"] },
-    { "stage": "Deployment", "duration": "1.5 weeks", "deliverables": ["Production release", "Telemetry verification"] },
-    { "stage": "Support", "duration": "Ongoing", "deliverables": ["SLA maintenance", "Monthly analytics report"] }
-  ],
-  "scopeOfWork": {
-    "projectScope": "Brief summary of boundaries matching the solution",
-    "features": ["Specific feature 1", "Specific feature 2"],
-    "deliverables": ["Deliverable 1", "Deliverable 2"],
-    "hardware": ["Hardware 1", "Hardware 2"],
-    "software": ["Software 1", "Software 2"],
-    "content": ["Content asset 1", "Content asset 2"],
-    "training": "Specific training approach",
-    "deployment": "Rollout method",
-    "support": "SLA & ongoing terms",
-    "exclusions": ["Out-of-scope item 1", "Out-of-scope item 2"]
-  }
-}`;
+5. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching the schema.`;
 
   try {
     const response = await callGeminiWithRetry(systemPrompt);
-    const data = JSON.parse(response.text);
+    const rawText = response.text || '';
+    const cleanJsonText = rawText.replace(/```json|```/g, "").trim();
+    const data = JSON.parse(cleanJsonText);
 
     if (statusBanner) {
       statusBanner.className = 'status-banner success';
@@ -614,7 +571,6 @@ ${techContext}). Format: "[Category] — THEXRA [Product Name]". Never invent pr
         const data = currentBriefData;
         const sow = data.scopeOfWork;
 
-        // Updated btn-save HTML string template
         const htmlDoc = `
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head>
@@ -697,7 +653,7 @@ ${sow ? `
         URL.revokeObjectURL(link.href);
       });
 
-      // Generate Proposal: Modal Document Preview
+      // Generate Proposal: Modal Document Preview (Day 17 Dynamic Mapping)
       document.getElementById('btn-proposal')?.addEventListener('click', () => {
         const modal = document.getElementById('proposalModal');
         const content = document.getElementById('proposalContent');
@@ -707,137 +663,141 @@ ${sow ? `
         const data = currentBriefData || {};
         const sow = data.scopeOfWork || {};
         const arch = data.solutionArchitecture || {};
+        const clientCompany = document.getElementById('companyName')?.value.trim() || 'Client Organization';
 
         content.innerHTML = `
         <div style="border-bottom: 2px solid #0F172A; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div>
-        <h1 style="margin: 0; font-size: 22px; color: #0F172A; font-weight: 700; letter-spacing: -0.02em;">THEXRA ENTERPRISE SOLUTION PROPOSAL</h1>
-        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748B;" font-weight: 600;">13-Section Formal AI Solution Brief</p>
-        </div>
-        <div style="text-align: right; font-size: 11px; color: #64748B;">
-        <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
-        <strong>Status:</strong> Proposal Template
-        </div>
+          <div>
+            <h1 style="margin: 0; font-size: 22px; color: #0F172A; font-weight: 700; letter-spacing: -0.02em;">THEXRA ENTERPRISE SOLUTION PROPOSAL</h1>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748B; font-weight: 600;">13-Section Formal Executive Proposal</p>
+          </div>
+          <div style="text-align: right; font-size: 11px; color: #64748B;">
+            <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
+            <strong>Status:</strong> Approved Proposal
+          </div>
         </div>
 
         <div class="proposal-template-grid" style="display: flex; flex-direction: column; gap: 18px; font-size: 13px; line-height: 1.5; color: #334155;">
 
-        <!-- Section 1: Executive Summary -->
-        <div class="proposal-section">
-        <strong class="section-label">1. Executive Summary</strong>
-        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #2563EB; padding: 8px 12px; border-radius: 4px; color: #475569; font-style: italic;">
-        [Template Placeholder]: Executive summary pitch highlighting strategic impact, solution fit, and high-level ROI for ${cleanText(document.getElementById('companyName')?.value || 'Client')}. </p>
-        </div>
-
-        <!-- Section 2: Client Challenge -->
-        <div class="proposal-section">
-        <strong class="section-label">2. Client Challenge</strong>
-        <p style="margin: 0;">${cleanText(data.businessProblem || 'Core operational bottleneck specified during discovery.')}</p>
-        </div>
-
-        <!-- Section 3: Project Objective -->
-        <div class="proposal-section">
-        <strong class="section-label">3. Project Objective</strong>
-        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #0284C7; padding: 8px 12px; border-radius: 4px; color: #475569;">
-        <strong>Target KPIs:</strong> ${cleanText(data.clientObjective || 'KPI target defined during intake.')}<br>
-        <span style="font-size: 11.5px; color: 64748B;">[Template Placeholder]: Primary business benchmarks, quantitative metrics, and adoption goals.</span>
-        </p>
-        </div>
-
-        <!-- Section 4: Proposed Solution -->
-      <div class="proposal-section">
-        <strong class="section-label">4. Proposed Solution</strong>
-        <p style="margin: 0;">${cleanText(data.solutionConcept || 'Recommended solution architecture concept.')}</p>
-        ${data.implementationApproach && data.implementationApproach.length > 0 ? `
-          <div style="margin-top: 6px;">
-            <strong style="font-size: 11px; text-transform: uppercase; color: #2563EB;">Implementation Phasing:</strong>
-            <ol style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-              ${data.implementationApproach.map(step => `<li>${cleanText(step)}</li>`).join('')}
-            </ol>
+          <!-- Section 1: Executive Summary -->
+          <div class="proposal-section">
+            <strong class="section-label">1. Executive Summary</strong>
+            <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #2563EB; padding: 8px 12px; border-radius: 4px; color: #334155;">
+              This enterprise proposal addresses core operational challenges for ${cleanText(clientCompany)}. By deploying ${cleanText(data.recommendedTechnology || 'THEXRA Platform')}, ${cleanText(clientCompany)} will achieve immediate workflow optimization, enhanced spatial analytics, and measurable ROI.
+            </p>
           </div>
-        ` : ''}
-      </div>
 
-      <!-- Section 5: User Experience (SPLIT OUT FROM ARCHITECTURE) -->
-      <div class="proposal-section">
-        <strong class="section-label">5. User Experience & Journey</strong>
-        <p style="margin: 0;"><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'Primary Personas')}</p>
-        <p style="margin: 4px 0 0 0;"><strong>Workflow:</strong> ${cleanText(arch.userJourney || 'Detailed end-user operational journey across spatial interfaces.')}</p>
-      </div>
+          <!-- Section 2: Client Challenge -->
+          <div class="proposal-section">
+            <strong class="section-label">2. Client Challenge</strong>
+            <p style="margin: 0;">${cleanText(data.businessProblem || 'Core operational bottleneck specified during discovery.')}</p>
+          </div>
 
-      <!-- Section 6: Solution Architecture -->
-      <div class="proposal-section" style="background: #F8FAFC; padding: 14px; border-radius: 6px; border: 1px solid #E2E8F0;">
-        <strong class="section-label" style="color: #0F172A;">6. Solution Architecture</strong>
-        <h3 style="margin: 0 0 8px 0; font-size: 14.5px; color: #0F172A;">${cleanText(data.recommendedTechnology || 'THEXRA Enterprise Architecture')}</h3>
+          <!-- Section 3: Project Objective -->
+          <div class="proposal-section">
+            <strong class="section-label">3. Project Objective</strong>
+            <div style="margin: 0; background: #F8FAFC; border-left: 3px solid #0284C7; padding: 8px 12px; border-radius: 4px; color: #334155;">
+              <strong>Primary Goal:</strong> ${cleanText(data.clientObjective || 'Achieve operational efficiency gains.')}<br>
+              <strong>Target Outcomes:</strong> ${cleanText(data.expectedBenefits || 'Streamlined user workflows and accurate tracking.')}
+            </div>
+          </div>
 
-        <div style="margin: 8px 0; padding: 8px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
-          <strong style="font-size: 10px; text-transform: uppercase; color: #2563EB; display: block; margin-bottom: 4px;">Automated System Flow Diagram:</strong>
-          ${renderArchitectureDiagram(arch, true)}
+          <!-- Section 4: Proposed Solution -->
+          <div class="proposal-section">
+            <strong class="section-label">4. Proposed Solution</strong>
+            <p style="margin: 0;">${cleanText(data.solutionConcept || 'Recommended solution architecture concept.')}</p>
+            ${data.implementationApproach && data.implementationApproach.length > 0 ? `
+              <div style="margin-top: 6px;">
+                <strong style="font-size: 11px; text-transform: uppercase; color: #2563EB;">Implementation Phasing:</strong>
+                <ol style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
+                  ${data.implementationApproach.map(step => `<li>${cleanText(step)}</li>`).join('')}
+                </ol>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Section 5: User Experience -->
+          <div class="proposal-section">
+            <strong class="section-label">5. User Experience & Journey</strong>
+            <p style="margin: 0;"><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'Primary Personas')}</p>
+            <p style="margin: 4px 0 0 0;"><strong>Workflow:</strong> ${cleanText(arch.userJourney || 'Detailed end-user operational journey across spatial interfaces.')}</p>
+          </div>
+
+          <!-- Section 6: Solution Architecture -->
+          <div class="proposal-section" style="background: #F8FAFC; padding: 14px; border-radius: 6px; border: 1px solid #E2E8F0;">
+            <strong class="section-label" style="color: #0F172A;">6. Solution Architecture</strong>
+            <h3 style="margin: 0 0 8px 0; font-size: 14.5px; color: #0F172A;">${cleanText(data.recommendedTechnology || 'THEXRA Enterprise Architecture')}</h3>
+
+            <div style="margin: 8px 0; padding: 8px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
+              <strong style="font-size: 10px; text-transform: uppercase; color: #2563EB; display: block; margin-bottom: 4px;">Automated System Flow Diagram:</strong>
+              ${renderArchitectureDiagram(arch, true)}
+            </div>
+
+            <div style="font-size: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
+              <div><strong>Hardware:</strong> ${(arch.hardware || []).join(', ') || 'N/A'}</div>
+              <div><strong>Software:</strong> ${(arch.software || []).join(', ') || 'N/A'}</div>
+              <div><strong>AI Components:</strong> ${(arch.aiComponents || []).join(', ') || 'N/A'}</div>
+              <div><strong>XR Components:</strong> ${(arch.xrComponents || []).join(', ') || 'N/A'}</div>
+              <div><strong>Backend:</strong> ${(arch.backend || []).join(', ') || 'N/A'}</div>
+              <div><strong>Dashboard:</strong> ${(arch.dashboard || []).join(', ') || 'N/A'}</div>
+              <div style="grid-column: 1 / -1;"><strong>Data Flow:</strong> <code>${cleanText(arch.dataFlow || 'N/A')}</code></div>
+            </div>
+          </div>
+
+          <!-- Section 7: Scope of Work -->
+          <div class="proposal-section">
+            <strong class="section-label">7. Scope of Work (SOW)</strong>
+            <p style="margin: 0;"><strong>Project Scope:</strong> ${cleanText(sow.projectScope || 'Scope boundary statement.')}</p>
+            <p style="margin: 4px 0 0 0;"><strong>Core Features:</strong> ${(sow.features || []).join(', ') || 'N/A'}</p>
+            <p style="margin: 4px 0 0 0; color: #DC2626;"><strong>Exclusions:</strong> ${(sow.exclusions || []).join(', ') || 'N/A'}</p>
+          </div>
+
+          <!-- Section 8: Deliverables -->
+          <div class="proposal-section">
+            <strong class="section-label">8. Deliverables</strong>
+            <p style="margin: 0;">${(sow.deliverables || []).join(' • ') || 'Key technical and operational deliverables list.'}</p>
+          </div>
+
+          <!-- Section 9: Implementation Plan -->
+          <div class="proposal-section">
+            <strong class="section-label">9. Implementation Plan</strong>
+            ${data.implementationPlan ? renderImplementationPlan(data.implementationPlan, true) : '<p style="margin:0;">7-Stage Execution Roadmap</p>'}
+          </div>
+
+          <!-- Section 10: Timeline -->
+          <div class="proposal-section">
+            <strong class="section-label">10. Timeline & Delivery Target</strong>
+            <p style="margin: 0;"><strong>Target Horizon:</strong> ${cleanText(document.getElementById('timeline')?.value || '6-8 weeks')}</p>
+          </div>
+
+          <!-- Section 11: Assumptions -->
+          <div class="proposal-section">
+            <strong class="section-label">11. Assumptions & Prerequisites</strong>
+            <div style="margin: 0; background: #F8FAFC; border-left: 3px solid #64748B; padding: 8px 12px; border-radius: 4px; color: #334155;">
+              <ul style="margin: 0; padding-left: 16px;">
+                <li>Technical Prerequisite: Dedicated network access provided by ${cleanText(clientCompany)} IT team.</li>
+                <li>Operational Prerequisite: Assigned single point of contact during rollout phase.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Section 12: Optional Add-ons -->
+          <div class="proposal-section">
+            <strong class="section-label">12. Optional Add-ons & Phase 2 Upsells</strong>
+            <div style="margin: 0; background: #F8FAFC; border-left: 3px solid #9333EA; padding: 8px 12px; border-radius: 4px; color: #334155;">
+              <strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'Phase 2 Scale Module')}<br>
+              <span style="font-size: 11.5px; color: #64748B;">Includes advanced predictive AI telemetry and extended SLA maintenance options.</span>
+            </div>
+          </div>
+
+          <!-- Section 13: Next Steps -->
+          <div class="proposal-section">
+            <strong class="section-label">13. Next Steps & Scoping Workshop</strong>
+            <p style="margin: 0;">${cleanText(data.recommendedNextStep || data.nextStep || 'Execute technical validation workshop and finalize SOW.')}</p>
+          </div>
+
         </div>
-
-        <div style="font-size: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 8px;">
-          <div><strong>Hardware:</strong> ${(arch.hardware || []).join(', ') || 'N/A'}</div>
-          <div><strong>Software:</strong> ${(arch.software || []).join(', ') || 'N/A'}</div>
-          <div><strong>AI Components:</strong> ${(arch.aiComponents || []).join(', ') || 'N/A'}</div>
-          <div><strong>XR Components:</strong> ${(arch.xrComponents || []).join(', ') || 'N/A'}</div>
-          <div><strong>Backend:</strong> ${(arch.backend || []).join(', ') || 'N/A'}</div>
-          <div><strong>Dashboard:</strong> ${(arch.dashboard || []).join(', ') || 'N/A'}</div>
-          <div style="grid-column: 1 / -1;"><strong>Data Flow:</strong> <code>${cleanText(arch.dataFlow || 'N/A')}</code></div>
-        </div>
-      </div>
-
-      <!-- Section 7: Scope of Work -->
-      <div class="proposal-section">
-        <strong class="section-label">7. Scope of Work (SOW)</strong>
-        <p style="margin: 0;"><strong>Project Scope:</strong> ${cleanText(sow.projectScope || 'Scope boundary statement.')}</p>
-        <p style="margin: 4px 0 0 0;"><strong>Core Features:</strong> ${(sow.features || []).join(', ') || 'N/A'}</p>
-        <p style="margin: 4px 0 0 0; color: #DC2626;"><strong>Exclusions:</strong> ${(sow.exclusions || []).join(', ') || 'N/A'}</p>
-      </div>
-
-      <!-- Section 8: Deliverables -->
-      <div class="proposal-section">
-        <strong class="section-label">8. Deliverables</strong>
-        <p style="margin: 0;">${(sow.deliverables || []).join(' • ') || 'Key technical and operational deliverables list.'}</p>
-      </div>
-
-      <!-- Section 9: Implementation Plan -->
-      <div class="proposal-section">
-        <strong class="section-label">9. Implementation Plan</strong>
-        ${data.implementationPlan ? renderImplementationPlan(data.implementationPlan, true) : '<p style="margin:0;">7-Stage Execution Roadmap</p>'}
-      </div>
-
-      <!-- Section 10: Timeline -->
-      <div class="proposal-section">
-        <strong class="section-label">10. Timeline & Delivery Target</strong>
-        <p style="margin: 0;"><strong>Target Horizon:</strong> ${cleanText(document.getElementById('timeline')?.value || '10 weeks')}</p>
-        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748B;">Includes discovery, design, development, acceptance testing, and on-site rollout.</p>
-      </div>
-
-      <!-- Section 11: Assumptions (NEW PLACEHOLDER) -->
-      <div class="proposal-section">
-        <strong class="section-label">11. Assumptions & Prerequisites</strong>
-        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #64748B; padding: 8px 12px; border-radius: 4px; color: #475569;">
-          [Day 16 Template Placeholder]: Key prerequisite technical access, client data provisioning, site network availability, and team resources.
-        </p>
-      </div>
-
-      <!-- Section 12: Optional Add-ons (NEW PLACEHOLDER) -->
-      <div class="proposal-section">
-        <strong class="section-label">12. Optional Add-ons & Phase 2 Upsells</strong>
-        <p style="margin: 0; background: #F8FAFC; border-left: 3px solid #9333EA; padding: 8px 12px; border-radius: 4px; color: #475569;">
-          <strong>Alternative Option:</strong> ${cleanText(data.alternativeRecommendation || 'Phase 2 Scale Recommendation')}<br>
-          <span style="font-size: 11.5px; color: #64748B;">[Day 16 Template Placeholder]: Optional maintenance extensions, advanced analytics upgrades, or additional spatial licenses.</span>
-        </p>
-      </div>
-
-      <!-- Section 13: Next Steps -->
-      <div class="proposal-section">
-        <strong class="section-label">13. Next Steps & Scoping Workshop</strong>
-        <p style="margin: 0;">${cleanText(data.recommendedNextStep || data.nextStep || 'Execute technical validation workshop and finalize SOW.')}</p>
-      </div>
-
-    </div>
-    `;
+        `;
 
         modal.style.display = 'block';
       });
@@ -846,8 +806,8 @@ ${sow ? `
         document.getElementById('proposalModal').style.display = 'none';
       });
 
-      document.getElementById('btn-modal-print')?.addEventListener('click', () => {
-        e.preventDefault(); // Prevents form submission and page reload
+      document.getElementById('btn-modal-print')?.addEventListener('click', (e) => {
+        e.preventDefault();
         window.print();
       });
     }
