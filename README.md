@@ -110,3 +110,16 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Single Payload Mapping:** Successfully mapped existing Day 15 brief data (Client Challenge, Solution, Architecture, SOW, Deliverables, Implementation Plan, Timeline, Next Steps) and separated User Experience into its own standalone section.
 - **Structured Draft Placeholders:** Built integrated containers and styled placeholder prompts for new sections (Executive Summary, Project Objectives, Assumptions, Optional Add-ons) ahead of AI content integration
 - **Modal Preview Styling:** Applied dedicated CSS rules and glassmorphism overlay controls to deliver a clean, desktop-optimized document view.
+
+## Day 17 — Proposal Generator & Data Integration
+- **13-Section Proposal Generator:** Built a dynamic proposal modal overlay from Step 1 intake data, stucturing a complete 13-section enterprise deliverable.
+- **Direct Client Data Mapping:**  Mapped live client inputs 
+- **Client-Grounded Fallback Mechanism:** Engineered a robust local fallback engine to seamlessly handle API rate limits (503/429) while preserving full client context.
+- **Syntax & UI Stabilization:** Fixed critical print event listener.
+
+## Day 18 —  Proposal Editor V1
+- **Web-Based Editor V1:** Delivered a modal interface for real-time proposal customization and preview.
+- **Section Controls:** Added live editing (`Edit`), section removal (`Delete`), and custom section addition (`Add`).
+- **Granular AI Regeneration:** Integrated async `gemini-3.8-flash` handlers to rewrite individual sections on demand.
+- **Snapshot Versioning:** Built a version management system (`Save version`) to capture and restore proposal drafts
+- **Zero-Placeholder Reliability:** Sanitized input fallbacks to ensure clean outputs with zero `N/A` strings.
