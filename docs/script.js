@@ -30,7 +30,7 @@ import { GoogleGenAI } from '@google/genai';
 const GEMINI_API_KEY = "GEMINIAPIKEY";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-// DAY 16 — Visual Architecture Flowchart Generator
+// Visual Architecture Flowchart Generator
 function renderArchitectureDiagram(architectureData, isProposal = false) {
   if (!architectureData) return '';
 
@@ -94,10 +94,10 @@ function renderImplementationPlan(planData, isProposal = false) {
   const durationColor = isProposal ? '#64748B' : '#94A3B8';
 
   return `
-    <ol style="margin: 0; padding-left: 16px; color: ${textColor}; font-size: 12px; line-height: 1.3;">
+    <ol style="margin: 0; padding-left: 16px; color: ${textColor}; font-size: 12px; line-height: 1.4;">
       ${planData.map((item) => {
     const deliverablesText = Array.isArray(item.deliverables) ? item.deliverables.join(' • ') : item.deliverables;
-    return `<li style="margin: 0;"><strong style="color: ${stageColor};">${cleanText(item.stage)}</strong> <span style="color: ${durationColor};">(${cleanText(item.duration)}):</span>${cleanText(deliverablesText)}</li>`;
+    return `<li style="margin: 4px 0;"><strong style="color: ${stageColor};">${cleanText(item.stage)}</strong> <span style="color: ${durationColor};">(${cleanText(item.duration)}): </span>${cleanText(deliverablesText)}</li>`;
   }).join('')}
     </ol>
   `;
@@ -150,177 +150,335 @@ const intakeForm = document.getElementById('intake-form');
 const statusBanner = document.getElementById('form-status');
 const briefOutput = document.getElementById('aiOutput');
 
+// Dynamic High-Quality Local Fallback Engine
 function generateLocalFallbackData(clientInfo) {
-  const comp = clientInfo.companyName || 'Client Organization';
-  const ind = clientInfo.industry || 'Enterprise';
-  const prob = clientInfo.problem || 'Operational bottlenecks';
-  const outcome = clientInfo.desiredOutcome || 'Efficiency gains';
-  const target = clientInfo.targetPersona || 'End Users';
-  const process = clientInfo.currentProcess || 'Manual procedures';
-  const time = clientInfo.timeline || '6-8 weeks';
+  const comp = clientInfo.companyName !== 'N/A' ? clientInfo.companyName : 'Client Organization';
+  const indName = clientInfo.industry !== 'N/A' ? clientInfo.industry : 'General Enterprise';
+  const prob = clientInfo.problem !== 'N/A' ? clientInfo.problem : 'operational bottlenecks';
+  const process = clientInfo.currentProcess !== 'N/A' ? clientInfo.currentProcess : 'legacy operational procedures';
+  const outcome = clientInfo.desiredOutcome !== 'N/A' ? clientInfo.desiredOutcome : 'efficiency improvements';
+  const target = clientInfo.targetPersona !== 'N/A' ? clientInfo.targetPersona : 'End Users';
+  const userScale = clientInfo.targetUserCount !== 'N/A' ? clientInfo.targetUserCount : 'Active Users';
+  const timeline = clientInfo.timeline !== 'N/A' ? clientInfo.timeline : '6-8 weeks';
+
+  const probText = prob.toLowerCase();
+  let category = "AR";
+  let productName = "Spatial Vision";
+
+  if (probText.includes('train') || probText.includes('simulat') || probText.includes('hazard') || probText.includes('lab') || indName === 'Education') {
+    category = "VR";
+    productName = "Immersive Training Simulator";
+  } else if (probText.includes('surg') || probText.includes('repair') || probText.includes('remot') || probText.includes('assist') || probText.includes('hands-free')) {
+    category = "MR";
+    productName = "Remote Assist Expert";
+  } else if (probText.includes('twin') || probText.includes('prototype') || probText.includes('building') || probText.includes('facility') || probText.includes('off-plan')) {
+    category = "Digital Twin";
+    productName = "Spatial Twin Operations";
+  } else if (probText.includes('predict') || probText.includes('data') || probText.includes('analytic') || probText.includes('inspection')) {
+    category = "AI Engine";
+    productName = "Predictive Intelligence Unit";
+  } else if (probText.includes('overcrowd') || probText.includes('tour') || probText.includes('navigation') || probText.includes('landmark') || indName.toLowerCase().includes('tourism')) {
+    category = "Location-Based";
+    productName = "Spatial Guide";
+  }
+
+  const recommendedTech = `${category} — THEXRA ${productName} (${indName} Enterprise Edition)`;
 
   return {
-    businessProblem: `In the ${ind} sector, ${comp} currently faces ${prob} driven by legacy processes (${process}).`,
-    clientObjective: `${outcome} within a targeted ${time} timeframe for ${target}.`,
-    recommendedTechnology: `AR — THEXRA View for ${ind}`,
-    solutionConcept: `Custom THEXRA spatial solution engineered specifically for ${comp} to replace ${process} and solve ${prob}.`,
-    targetUsers: `${target} (${clientInfo.targetUserCount || '10-50'} active users)`,
-    expectedBenefits: `Directly achieves ${outcome} while modernizing current ${process}.`,
-    why: `THEXRA View directly eliminates ${prob} by replacing ${process} with interactive visual guidance. Specially configured for ${comp}'s operational team.`,
+    businessProblem: `In the ${indName} sector, ${comp} faces significant operational bottlenecks characterized by "${prob}". This issue stems directly from reliance on ${process}, which severely hampers throughput and scales errors.`,
+    clientObjective: `Transition ${comp} away from ${process} by deploying an enterprise spatial ecosystem, specifically targeted to achieve "${outcome}" for ${target} (${userScale}) within a ${timeline} timeline.`,
+    recommendedTechnology: recommendedTech,
+    solutionConcept: `Custom THEXRA ${category} spatial framework designed specifically for ${comp}. It digitizes and automates ${process} into an interactive, real-time spatial workflow that directly resolves "${prob}".`,
+    targetUsers: `${target} (${userScale} active users)`,
+    expectedBenefits: `Directly targets ${outcome} while replacing inefficient ${process}, driving up to a 40% reduction in operational friction and downtime.`,
+    why: `The ${category} architecture solves "${prob}" by converting ${process} into an intuitive spatial experience. THEXRA ${productName} provides the ideal enterprise foundation for ${comp}'s operational requirements.`,
     solutionArchitecture: {
-      solutionOverview: `Integrated THEXRA cloud and spatial mobile interface architecture customized for ${comp}.`,
-      userJourney: `${target} authenticates -> Loads ${ind} workflow -> Interacts with digitized spatial steps -> Automatically logs analytics.`,
-      hardware: ["Enterprise Mobile / Tablet Devices"],
-      software: [`THEXRA ${ind} Core Module`],
-      aiComponents: ["Automated Workflow Engine"],
-      xrComponents: ["Interactive Spatial Overlay"],
-      backend: ["Encrypted Enterprise Cloud Storage"],
-      dashboard: ["Executive Operations Dashboard"],
-      dataFlow: "Edge Device -> Secure Gateway -> Real-time Analytics"
+      solutionOverview: `Integrated cloud-native and spatial edge framework custom-engineered for ${comp}.`,
+      userJourney: `${target} authenticates -> Scans environment -> Interacts with digitized ${process} workflow -> Syncs real-time telemetry to management console.`,
+      hardware: ["Enterprise Smart Headset / Mobile Tablet"],
+      software: [`THEXRA ${indName} Core Module`],
+      aiComponents: ["Automated Process Inspection Engine"],
+      xrComponents: [`Interactive ${category} Spatial UI`],
+      backend: ["Encrypted Enterprise Cloud Repository"],
+      dashboard: ["Real-time Operations & Telemetry Dashboard"],
+      dataFlow: "Edge Device -> Secure Gateway -> Real-time Analytics Engine -> Executive Dashboard"
     },
-    implementationApproach: ["Phase 1: Workflow Digitization", "Phase 2: Pilot Deployment", "Phase 3: Organization Rollout"],
+    implementationApproach: [
+      `Phase 1: ${process} Digitization & Spatial Mapping`,
+      `Phase 2: Targeted Pilot Rollout for ${target}`,
+      `Phase 3: Production Scale & Enterprise Deployment`
+    ],
     implementationPlan: [
-      { stage: "Discovery & Setup", duration: "1 week", deliverables: [`Technical specs for ${process}`] },
-      { stage: "Core Build & Testing", duration: "3 weeks", deliverables: ["Working THEXRA module and QA report"] },
-      { stage: "Deployment & Onboarding", duration: "1 week", deliverables: [`User onboarding for ${target}`] }
+      { stage: "Discovery", duration: "1 week", deliverables: [`Audit report & technical specifications tailored to ${comp}`] },
+      { stage: "Design", duration: "1 week", deliverables: ["Spatial UI/UX wireframes & architectural standards"] },
+      { stage: "Prototype", duration: "1 week", deliverables: ["Working functional prototype & user testing report"] },
+      { stage: "Development", duration: "2 weeks", deliverables: ["Core module feature build & cloud pipeline setup"] },
+      { stage: "Testing", duration: "1 week", deliverables: ["Cross-device QA & performance benchmark"] },
+      { stage: "Deployment", duration: "1 week", deliverables: [`Production release for ${target}`] },
+      { stage: "Support", duration: "Ongoing", deliverables: ["Dedicated SLA technical support & monthly updates"] }
     ],
     scopeOfWork: {
-      projectScope: `Core delivery of THEXRA platform tailored to streamline ${prob} for ${comp}.`,
-      features: ["Real-time spatial tracking", "Automated activity reporting"],
-      deliverables: ["THEXRA App Access", "Admin Analytics Dashboard"],
-      hardware: ["Client-provided handheld hardware"],
-      software: ["THEXRA Core License"],
+      projectScope: `Turnkey delivery of customized THEXRA platform engineered to eliminate ${prob} for ${comp}.`,
+      features: ["Real-time spatial tracking", "Automated telemetry reporting"],
+      deliverables: ["THEXRA Spatial App Access", "Admin Analytics Portal"],
+      hardware: ["THEXRA-validated enterprise devices"],
+      software: [`THEXRA ${indName} Enterprise License`],
       content: ["Customized UI Asset Pack"],
-      training: `1-Day Workshop for ${target}`,
-      deployment: "Managed Enterprise Cloud Release",
-      support: "8/5 SLA Technical Support",
-      exclusions: ["Third-party legacy system refactoring"]
+      training: `1-Day Operational Workshop for ${target}`,
+      deployment: "Managed Enterprise Cloud Infrastructure",
+      support: "Dedicated SLA Technical Support",
+      exclusions: ["Third-party legacy physical infrastructure modification"]
     },
-    recommendedNextStep: `Schedule 30-minute technical scoping review for ${comp}.`
+    recommendedNextStep: `Schedule a 30-minute technical scoping review with THEXRA architects and ${comp} leadership.`
   };
 }
 
-// Helper function to call Gemini with automatic retries and backoff delay
-async function callGeminiWithRetry(prompt, maxRetries = 3, baseDelayMs = 1500) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+// Single-Model Helper locked to gemini-3.8-flash with JSON Enforcement & Exponential Backoff
+async function callGeminiWithRetry(prompt, maxRetries = 3, baseDelayMs = 2000) {
+  const modelName = 'gemini-3.8-flash';
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      console.log(`Gemini API Call — Attempt ${attempt} of ${maxRetries}...`);
+      console.log(`Gemini API Call — Attempt ${attempt + 1} of ${maxRetries} using model: ${modelName}...`);
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: modelName,
         contents: prompt,
         config: {
-          responseMimeType: "application/json",
-          temperature: 0.1
+          responseMimeType: "application/json", // Mandates clean JSON output from Gemini
+          temperature: 0.2
         }
       });
 
-      return response; // Success! Return Gemini response
+      return response; // Success!
     } catch (err) {
-      console.warn(`Gemini API Attempt ${attempt} failed:`, err.message || err);
+      console.warn(`Gemini API Attempt ${attempt + 1} (${modelName}) failed:`, err.message || err);
 
-      // If we've reached max retries, throw the error to engage local fallback
-      if (attempt === maxRetries) {
-        throw new Error(`Gemini failed after ${maxRetries} retries: ${err.message}`);
+      if (attempt === maxRetries - 1) {
+        throw new Error(`Gemini failed after ${maxRetries} attempts: ${err.message}`);
       }
 
-      // Calculate exponential wait delay (1.5s, 3s, etc.)
-      const delay = baseDelayMs * Math.pow(2, attempt - 1);
-      console.log(`Retrying in ${delay}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      const delaySeconds = delay / 1000;
+
+      for (let sec = delaySeconds; sec > 0; sec--) {
+        if (statusBanner) {
+          statusBanner.className = 'status-banner loading';
+          statusBanner.innerText = `Gemini server busy. Retrying attempt ${attempt + 2}/${maxRetries} in ${sec}s...`;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
     }
   }
 }
 
-// Form Submission Handler
+// Automatically clear red error borders when user types
+document.querySelectorAll('input, select, textarea').forEach(element => {
+  element.addEventListener('input', () => {
+    element.style.borderColor = '';
+    element.classList.remove('input-error');
+  });
+});
+
+// Form Submission Handler with Field Validation & Red Outlines
 intakeForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // Reset all previous error states
+  const allFormInputs = intakeForm.querySelectorAll('input, select, textarea, label, .radio-card, .radio-group');
+  allFormInputs.forEach(el => {
+    el.style.borderColor = '';
+    el.classList.remove('input-error');
+  });
+
+  let hasError = false;
+  let firstErrorField = null;
+
+  const markError = (element) => {
+    if (!element) return;
+    hasError = true;
+    element.style.borderColor = '#EF4444';
+    element.classList.add('input-error');
+    if (!firstErrorField) firstErrorField = element;
+  };
+
+  // Helper to safely fetch elements by multiple potential IDs or Names
+  const getEl = (...identifiers) => {
+    for (const id of identifiers) {
+      const el = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
+      if (el) return el;
+    }
+    return null;
+  };
+
+  // 1. Company Name *
+  const companyInput = getEl('companyName', 'company_name', 'clientCompany');
+  if (!companyInput || !companyInput.value.trim()) markError(companyInput);
+
+  // 2. Industry Vertical *
+  const industrySelect = getEl('industry', 'industryVertical', 'industry_vertical');
+  if (!industrySelect || !industrySelect.value || industrySelect.value.toLowerCase().includes('select')) markError(industrySelect);
+
+  // 3. Target User Count (Scale) *
+  const targetUserRadio = document.querySelector('input[name="targetUserCount"]:checked') || document.querySelector('input[name="scale"]:checked');
+  if (!targetUserRadio) {
+    const radioInputs = document.querySelectorAll('input[name="targetUserCount"], input[name="scale"]');
+    radioInputs.forEach(radio => {
+      const parentCard = radio.closest('label') || radio.parentElement;
+      if (parentCard) markError(parentCard);
+    });
+  }
+
+  // 4. Core Business Problem *
+  const problemInput = getEl('problem', 'coreProblem', 'businessProblem', 'frictionPoints');
+  if (!problemInput || !problemInput.value.trim()) markError(problemInput);
+
+  // 5. Target End-Users *
+  const targetUsersInput = getEl('targetEndUsers', 'targetUser', 'target_end_users', 'endUsers');
+  if (!targetUsersInput || !targetUsersInput.value.trim()) markError(targetUsersInput);
+
+  // 6. Desired Business Outcome / KPIs *
+  const outcomeInput = getEl('desiredOutcome', 'kpis', 'businessOutcome', 'desired_outcome');
+  if (!outcomeInput || !outcomeInput.value.trim()) markError(outcomeInput);
+
+  // 7. Estimated Budget Range *
+  const budgetSelect = getEl('budgetRange', 'estimatedBudget', 'budget_range', 'budget');
+  if (budgetSelect && (!budgetSelect.value || budgetSelect.value.toLowerCase().includes('select'))) {
+    markError(budgetSelect);
+  }
+
+  // 8. Delivery Timeline *
+  const timelineSelect = getEl('timeline', 'deliveryTimeline', 'delivery_timeline');
+  if (timelineSelect && (!timelineSelect.value || timelineSelect.value.toLowerCase().includes('select'))) {
+    markError(timelineSelect);
+  }
+
+  // Halt execution if any required field is missing
+  if (hasError) {
+    if (statusBanner) {
+      statusBanner.className = 'status-banner error';
+      statusBanner.innerText = 'Please complete all required fields (*).';
+      statusBanner.style.display = 'block';
+    }
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return; // STOP execution
+  }
+
+  // Build clientInfo with user values or N/A
   const clientInfo = {
-    companyName: document.getElementById('companyName')?.value.trim() || 'Client Organization',
-    industry: document.getElementById('industry')?.value.trim() || 'General Enterprise',
-    problem: document.getElementById('problem')?.value.trim() || 'Operational Bottlenecks',
-    targetPersona: document.getElementById('targetUser')?.value.trim() || 'End Users',
-    targetUserCount: document.querySelector('input[name="targetUserCount"]:checked')?.value || '10-50',
-    currentProcess: document.getElementById('currentProcess')?.value.trim() || 'Manual Workflow',
-    desiredOutcome: document.getElementById('desiredOutcome')?.value.trim() || 'Efficiency Gains',
-    budgetRange: document.getElementById('budgetRange')?.value.trim() || 'Standard Enterprise',
-    timeline: document.getElementById('timeline')?.value.trim() || '6-8 weeks'
+    companyName: companyInput?.value.trim() || 'N/A',
+    industry: industrySelect?.value.trim() || 'N/A',
+    location: document.getElementById('location')?.value.trim() || document.getElementById('hqLocation')?.value.trim() || 'N/A',
+    problem: problemInput?.value.trim() || 'N/A',
+    targetPersona: targetUsersInput?.value.trim() || 'N/A',
+    targetUserCount: targetUserRadio?.value || 'N/A',
+    currentProcess: document.getElementById('currentProcess')?.value.trim() || document.getElementById('operationalProcess')?.value.trim() || 'N/A',
+    desiredOutcome: outcomeInput?.value.trim() || 'N/A',
+    budgetRange: budgetSelect?.value.trim() || 'N/A',
+    timeline: timelineSelect?.value.trim() || 'N/A',
+    specialRequirements: document.getElementById('specialRequirements')?.value.trim() || 'N/A'
   };
 
   const submitBtn = intakeForm.querySelector('button[type="submit"]');
 
   if (statusBanner) {
     statusBanner.className = 'status-banner loading';
-    statusBanner.innerText = 'Analyzing requirements with Gemini (this may take up to 30s)...';
+    statusBanner.innerText = 'Analyzing requirements with Gemini live AI...';
   }
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.innerText = 'Generating Brief...';
   }
 
+  const industryList = industryKnowledge.industries || [];
+  const selectedIndustryData = industryList.find(
+    i => i.name.toLowerCase() === clientInfo.industry.toLowerCase()
+  );
+
+  const techContext = Object.keys(techKnowledge).length ? JSON.stringify(techKnowledge) : "Standard THEXRA Product Catalog";
+  const industryContext = selectedIndustryData ? JSON.stringify(selectedIndustryData) : "Standard Enterprise Domain";
+
   let data = null;
 
   try {
-    const prompt = `Role: Expert Enterprise Solution Architect for THEXRA. Analyze client data and return RAW VALID JSON ONLY:
-Client: ${clientInfo.companyName} (${clientInfo.industry})
-Problem: ${clientInfo.problem}
-Target User: ${clientInfo.targetPersona} (${clientInfo.targetUserCount} users)
-Current Process: ${clientInfo.currentProcess}
-Goal: ${clientInfo.desiredOutcome}
-Timeline: ${clientInfo.timeline}
+    const prompt = `Role: Expert Enterprise AI & Solution Architect for THEXRA.
+Task: Analyze client intake data using grounded technology knowledge (${techContext}) and industry knowledge (${industryContext}). Be concise, clear, and direct.
 
-Return JSON with exact keys:
+CLIENT DATA:
+Company Name: ${clientInfo.companyName}
+Industry: ${clientInfo.industry}
+Core Business Problem: ${clientInfo.problem}
+Current Operational Process: ${clientInfo.currentProcess}
+Target Users: ${clientInfo.targetPersona} (${clientInfo.targetUserCount} active users)
+Desired Business Outcome: ${clientInfo.desiredOutcome}
+Budget Range: ${clientInfo.budgetRange}
+Target Timeline: ${clientInfo.timeline}
+
+CRITICAL FORMAT & GROUNDING RULES:
+1. "recommendedTechnology": You MUST analyze the specific Core Business Problem (${clientInfo.problem}) alongside the Suitable Technologies from ${industryContext}. Select the single technology category that directly solves this exact problem (e.g., use VR for simulation/training/hazards, MR for surgical/remote/hands-free assistance, AR for visual overlays/wayfinding, Digital Twin for prototyping/facilities, or AI for predictive analytics/data). Format: "[Category] — THEXRA [Product Name] (${clientInfo.industry} Edition)".
+2. "why": Exactly 2 concise sentences: (1) Why tech category solves ${clientInfo.problem}, (2) Why THEXRA suits ${clientInfo.companyName}.
+3. "implementationPlan": MUST contain exactly 7 sequential stages: Discovery, Design, Prototype, Development, Testing, Deployment, Support. 
+   - Durations MUST be formatted cleanly (e.g., "1 week", "1.5 weeks", "2 weeks", "Ongoing").
+   - Deliverables MUST be straightforward, clear business items that anyone can understand.
+   - Cumulative time across stages 1 to 6 MUST strictly fit the target timeline (${clientInfo.timeline}).
+4. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
+
 {
-  "businessProblem": "${clientInfo.problem}",
-  "clientObjective": "${clientInfo.desiredOutcome}",
-  "recommendedTechnology": "AR — THEXRA View",
-  "solutionConcept": "High-level architectural concept.",
-  "targetUsers": "${clientInfo.targetPersona}",
-  "expectedBenefits": "${clientInfo.desiredOutcome}",
-  "why": "Two short sentences explaining why THEXRA suits ${clientInfo.companyName}.",
+  "businessProblem": "Detailed summary of ${clientInfo.companyName}'s problem in ${clientInfo.industry}, specifically how ${clientInfo.currentProcess} creates bottlenecks.",
+  "clientObjective": "Specific goal to achieve ${clientInfo.desiredOutcome} for ${clientInfo.targetPersona} within ${clientInfo.timeline}.",
+  "recommendedTechnology": "[Category] — THEXRA [Product Name] (${clientInfo.industry} Edition)",
+  "solutionConcept": "High-level architectural concept explaining how THEXRA replaces ${clientInfo.currentProcess} to solve ${clientInfo.problem}.",
+  "targetUsers": "${clientInfo.targetPersona} (${clientInfo.targetUserCount} active users)",
+  "expectedBenefits": "Concrete operational outcomes focusing on ${clientInfo.desiredOutcome}.",
+  "why": "Sentence 1 explaining why the technology category addresses ${clientInfo.problem}. Sentence 2 explaining why THEXRA suits ${clientInfo.companyName}.",
   "solutionArchitecture": {
-    "solutionOverview": "Technical overview.",
-    "userJourney": "User workflow path.",
-    "hardware": ["Client Handheld Device"],
+    "solutionOverview": "Technical overview framework",
+    "userJourney": "${clientInfo.targetPersona} authenticates -> Scans workspace -> Executes digitized ${clientInfo.currentProcess} workflow -> Syncs real-time data.",
+    "hardware": ["Enterprise Devices"],
     "software": ["THEXRA Core Module"],
-    "aiComponents": ["Automated Data Processing"],
+    "aiComponents": ["Automated Process Engine"],
     "xrComponents": ["Interactive Spatial UI"],
-    "backend": ["Cloud Database"],
+    "backend": ["Secure Enterprise Cloud"],
     "dashboard": ["Analytics Portal"],
-    "dataFlow": "Device -> Edge -> Cloud"
+    "dataFlow": "Device -> Edge -> Cloud -> Analytics"
   },
-  "implementationApproach": ["Phase 1: Setup", "Phase 2: Pilot", "Phase 3: Rollout"],
+  "implementationApproach": ["Phase 1 description", "Phase 2 description", "Phase 3 description"],
   "implementationPlan": [
-    { "stage": "Discovery", "duration": "1 week", "deliverables": ["Specs & Scope"] },
-    { "stage": "Build", "duration": "3 weeks", "deliverables": ["Core Build"] },
-    { "stage": "Launch", "duration": "1 week", "deliverables": ["Production Release"] }
+    { "stage": "Discovery", "duration": "1 week", "deliverables": ["Audit report", "Technical specs"] },
+    { "stage": "Design", "duration": "1 week", "deliverables": ["UI mockups", "Spatial standards"] },
+    { "stage": "Prototype", "duration": "1 week", "deliverables": ["Working prototype", "Validation report"] },
+    { "stage": "Development", "duration": "2 weeks", "deliverables": ["Core feature build", "Backend sync setup"] },
+    { "stage": "Testing", "duration": "1 week", "deliverables": ["Cross-device QA", "Performance benchmark"] },
+    { "stage": "Deployment", "duration": "1 week", "deliverables": ["Production release", "Telemetry verification"] },
+    { "stage": "Support", "duration": "Ongoing", "deliverables": ["SLA maintenance", "Monthly analytics report"] }
   ],
   "scopeOfWork": {
-    "projectScope": "Key scope boundaries.",
+    "projectScope": "Delivery of customized THEXRA platform to automate ${clientInfo.currentProcess} for ${clientInfo.companyName}.",
     "features": ["Core Feature 1", "Core Feature 2"],
     "deliverables": ["Deliverable 1", "Deliverable 2"],
-    "hardware": ["Device Hardware"],
-    "software": ["THEXRA Software"],
-    "content": ["UI Assets"],
-    "training": "Operational Onboarding",
-    "deployment": "Phased Rollout",
-    "support": "Monthly SLA",
-    "exclusions": ["Legacy Systems Maintenance"]
+    "hardware": ["Client-supplied enterprise devices"],
+    "software": ["THEXRA Enterprise License"],
+    "content": ["Customized UI Asset Pack"],
+    "training": "1-Day Operational Workshop for ${clientInfo.targetPersona}",
+    "deployment": "Managed Cloud Release",
+    "support": "Dedicated SLA Technical Support",
+    "exclusions": ["Legacy third-party hardware refactoring"]
   },
-  "recommendedNextStep": "Schedule 30-minute scoping workshop."
+  "recommendedNextStep": "Schedule a 30-minute technical scoping review for ${clientInfo.companyName}."
 }`;
 
-    const response = await callGeminiWithRetry(prompt, 3, 5000);
-    const rawText = response.text || '';
+    const response = await callGeminiWithRetry(prompt, 3);
+    const rawText = response.text ? (typeof response.text === 'function' ? response.text() : response.text) : '';
     data = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
     if (statusBanner) {
       statusBanner.className = 'status-banner success';
-      statusBanner.innerText = 'AI Brief Generated Successfully!';
+      statusBanner.innerText = 'AI Brief Generated Successfully (Live Gemini)!';
     }
   } catch (err) {
-    console.warn("Gemini slow or busy. Using instant local fallback engine.");
+    console.warn("Gemini API error or timeout. Falling back to Instant Engine:", err);
     data = generateLocalFallbackData(clientInfo);
 
     if (statusBanner) {
@@ -338,7 +496,7 @@ Return JSON with exact keys:
   renderBriefOutput(data, clientInfo);
 });
 
-// DAY 15 & DAY 16 — Complete Solution Brief UI (With Full 9-Module Architecture Grid & Day 15 Action Buttons)
+// Render Solution Brief UI
 function renderBriefOutput(data, clientInfo) {
   if (!briefOutput) return;
 
@@ -378,7 +536,7 @@ function renderBriefOutput(data, clientInfo) {
         ${renderScopeOfWork(data.scopeOfWork, false)}
       </div>
 
-      <!-- 4. Technology Architecture Blueprint (Visual Flowchart + Full 9-Module Architecture Grid) -->
+      <!-- 4. Technology Architecture Blueprint -->
       <div class="glass-card" style="padding: 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
         <span style="font-size: 10px; text-transform: uppercase; color: #38BDF8; font-weight: 700; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">4. Technology Selection</span>
         <h3 style="margin: 0 0 10px 0; color: #FFF; font-size: 14.5px; font-weight: 700;">${cleanText(data.recommendedTechnology)}</h3>
@@ -389,7 +547,7 @@ function renderBriefOutput(data, clientInfo) {
           ${renderArchitectureDiagram(arch, false)}
         </div>
 
-        <!-- DAY 16: Full 9-Module Architecture Data Fields Grid -->
+        <!-- 9-Module Architecture Grid -->
         <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #CBD5E1;">
           <div><strong style="color: #38BDF8;">1. Overview:</strong> ${cleanText(arch.solutionOverview || 'Enterprise Solution Architecture')}</div>
           <div><strong style="color: #38BDF8;">2. User Journey:</strong> ${cleanText(arch.userJourney || 'Seamless spatial UI workflow')}</div>
@@ -445,7 +603,7 @@ function renderBriefOutput(data, clientInfo) {
         <p style="margin: 0; color: #E2E8F0; font-size: 13px; line-height: 1.3;">${cleanText(data.recommendedNextStep)}</p>
       </div>
 
-      <!-- DAY 15 ACTION BUTTONS BAR: Save, Edit, Regenerate Section, Generate Proposal -->
+      <!-- Action Buttons Bar -->
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
         <button type="button" id="btn-save" style="flex: 1; min-width: 110px; padding: 8px; font-size: 11.5px; background: rgba(52, 211, 153, 0.2); border: 1px solid #10B981; color: #34D399; border-radius: 5px; cursor: pointer; font-weight: 600;">Save</button>
         <button type="button" id="btn-edit" style="flex: 1; min-width: 110px; padding: 8px; font-size: 11.5px; background: rgba(148, 163, 184, 0.2); border: 1px solid #64748B; color: #CBD5E1; border-radius: 5px; cursor: pointer; font-weight: 600;">Edit</button>
@@ -481,7 +639,6 @@ function renderBriefOutput(data, clientInfo) {
     intakeForm?.scrollIntoView({ behavior: 'smooth' });
   });
 
-  // Handler: Regenerate section (Triggers fresh generation with subtle variation)
   document.getElementById('btn-regenerate')?.addEventListener('click', async () => {
     if (statusBanner) {
       statusBanner.className = 'status-banner loading';
@@ -496,7 +653,6 @@ function renderBriefOutput(data, clientInfo) {
     `;
     }
 
-    // Force intake form resubmission
     intakeForm?.requestSubmit();
   });
 
@@ -505,15 +661,19 @@ function renderBriefOutput(data, clientInfo) {
   });
 }
 
-// DAY 18 — PROPOSAL EDITOR V1 CORE ENGINE (High-Contrast Clean Inputs)
+// Proposal Editor Modal Handler
 function openProposalEditor(data, clientInfo) {
   const modal = document.getElementById('proposalModal');
   const content = document.getElementById('proposalContent');
 
   if (!modal || !content) return;
 
+  const realCompany = clientInfo.companyName && clientInfo.companyName !== 'N/A'
+    ? clientInfo.companyName
+    : 'Client Organization';
+
   const sections = [
-    { title: "1. Executive Summary", text: `This executive proposal outlines the deployment of ${data.recommendedTechnology} for ${clientInfo.companyName || 'Client Organization'}.` },
+    { title: "1. Executive Summary", text: `This executive proposal outlines the deployment of ${data.recommendedTechnology || 'THEXRA Spatial View'} for ${realCompany} to solve critical operational bottlenecks.` },
     { title: "2. Client Challenge", text: cleanText(data.businessProblem) },
     { title: "3. Project Objective", text: cleanText(data.clientObjective) },
     { title: "4. Proposed Solution", text: cleanText(data.solutionConcept) },
@@ -529,7 +689,6 @@ function openProposalEditor(data, clientInfo) {
     content.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 14px; text-align: left; font-family: inherit;">
         
-        <!-- Editor Control Toolbar -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: #F1F5F9; padding: 10px 12px; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
           <div>
             <h2 style="margin: 0; color: #0F172A; font-size: 18px; font-weight: 700;">PROPOSAL EDITOR V1</h2>
@@ -545,7 +704,6 @@ function openProposalEditor(data, clientInfo) {
           </div>
         </div>
 
-        <!-- Dynamic Section List -->
         ${sections.map((sec, idx) => `
           <div class="editor-section-card" style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; padding: 12px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px;">
@@ -555,51 +713,130 @@ function openProposalEditor(data, clientInfo) {
                 <button type="button" data-idx="${idx}" class="btn-del-sec" style="padding: 4px 8px; font-size: 10.5px; background: #EF4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Delete</button>
               </div>
             </div>
-            <textarea data-idx="${idx}" class="sec-text-input" style="width: 100%; height: 60px; font-size: 12px; border: 1px solid #CBD5E1; border-radius: 4px; padding: 6px; box-sizing: border-box; color: #0F172A; background: #FFFFFF; font-family: inherit; resize: vertical;">${sec.text}</textarea>
+            <textarea data-idx="${idx}" class="sec-text-input" style="width: 100%; min-height: 85px; font-size: 12px; line-height: 1.4; border: 1px solid #CBD5E1; border-radius: 4px; padding: 8px; box-sizing: border-box; color: #0F172A; background: #FFFFFF; font-family: inherit; resize: vertical;">${sec.text}</textarea>
           </div>
         `).join('')}
 
       </div>
     `;
 
-    // 1. Edit Handlers
+    // Input change listeners
     document.querySelectorAll('.sec-title-input').forEach(input => {
-      input.addEventListener('change', (e) => {
-        sections[e.target.dataset.idx].title = e.target.value;
-      });
+      input.addEventListener('change', (e) => { sections[e.target.dataset.idx].title = e.target.value; });
     });
 
     document.querySelectorAll('.sec-text-input').forEach(textarea => {
-      textarea.addEventListener('change', (e) => {
-        sections[e.target.dataset.idx].text = e.target.value;
-      });
+      textarea.addEventListener('change', (e) => { sections[e.target.dataset.idx].text = e.target.value; });
     });
 
-    // 2. Delete Handlers
     document.querySelectorAll('.btn-del-sec').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const idx = e.target.dataset.idx;
-        sections.splice(idx, 1);
+        sections.splice(e.target.dataset.idx, 1);
         renderEditorSections();
       });
     });
 
-    // 3. Regenerate Handlers
+    // Real-time Async Section Regenerator with N/A Sanitization & Unique Fallbacks
     document.querySelectorAll('.btn-regen-sec').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const idx = e.target.dataset.idx;
-        sections[idx].text = `[Refreshed] Updated ${sections[idx].title} scope for ${clientInfo.companyName || 'Client'}.`;
-        renderEditorSections();
+        const targetBtn = e.target;
+        const targetSection = sections[idx];
+        const sectionTitle = targetSection.title;
+        const currentText = targetSection.text;
+
+        targetBtn.disabled = true;
+        targetBtn.innerText = 'Refreshing...';
+
+        const targetTextarea = document.querySelector(`textarea[data-idx="${idx}"]`);
+        if (targetTextarea) {
+          targetTextarea.value = `[AI Refresher] Generating dynamic updates for ${sectionTitle}...`;
+          targetTextarea.style.background = '#F8FAFC';
+        }
+
+        // Sanitize "N/A" values into professional context strings
+        const company = (realCompany && realCompany !== 'N/A') ? realCompany : 'Client Organization';
+        const industry = (clientInfo.industry && clientInfo.industry !== 'N/A') ? clientInfo.industry : 'Healthcare & Life Sciences';
+        const problem = (clientInfo.problem && clientInfo.problem !== 'N/A') ? clientInfo.problem : 'high physical training costs and operational risks';
+        const process = (clientInfo.currentProcess && clientInfo.currentProcess !== 'N/A') ? clientInfo.currentProcess : 'legacy manual training workflows';
+        const outcome = (clientInfo.desiredOutcome && clientInfo.desiredOutcome !== 'N/A') ? clientInfo.desiredOutcome : 'surgical precision and reduced training overhead';
+
+        try {
+          const sectionPrompt = `Role: Expert Enterprise Solution Architect for THEXRA.
+Task: Write a single, highly detailed, professional paragraph for the proposal section titled "${sectionTitle}".
+
+CLIENT CONTEXT:
+- Company Name: ${company}
+- Industry: ${industry}
+- Core Business Problem: ${problem}
+- Current Operational Process: ${process}
+- Target Outcome: ${outcome}
+- Existing Content: "${currentText}"
+
+CRITICAL INSTRUCTIONS:
+1. Write 2-3 concise, realistic sentences specifically tailored to "${sectionTitle}".
+2. Do NOT use generic templates. Address ${company}'s specific situation.
+3. Return raw plain text ONLY. Do NOT use markdown, JSON wrappers, or quotation marks.`;
+
+          // Call Gemini API directly for plain text generation
+          const response = await ai.models.generateContent({
+            model: 'gemini-3.8-flash',
+            contents: sectionPrompt,
+            config: { temperature: 0.4 }
+          });
+
+          let freshText = '';
+          if (response && response.text) {
+            freshText = typeof response.text === 'function' ? response.text() : response.text;
+          }
+
+          freshText = cleanText(freshText.replace(/```json|```/g, "").replace(/^["']|["']$/g, ""));
+
+          if (freshText && freshText.length > 15) {
+            sections[idx].text = freshText;
+          } else {
+            throw new Error('Response too short or empty');
+          }
+        } catch (err) {
+          console.warn(`Section regeneration fallback triggered for "${sectionTitle}":`, err);
+
+          // Granular, section-specific fallbacks (Guarantees unique text across all 10 sections!)
+          const titleLower = sectionTitle.toLowerCase();
+
+          if (titleLower.includes('summary') || titleLower.includes('executive')) {
+            sections[idx].text = `This executive proposal outlines the strategic deployment of THEXRA technologies for ${company}. By digitizing ${process}, the solution directly eliminates operational bottlenecks to deliver sustainable enterprise efficiency in the ${industry} sector.`;
+          } else if (titleLower.includes('challenge') || titleLower.includes('problem')) {
+            sections[idx].text = `${company} currently experiences severe operational friction caused by ${problem}. Continued reliance on ${process} limits scaling and increases overall execution risk.`;
+          } else if (titleLower.includes('objective') || titleLower.includes('goal')) {
+            sections[idx].text = `The strategic goal for ${company} is to replace ${process} with an automated spatial platform, unlocking "${outcome}" across key operational performance metrics.`;
+          } else if (titleLower.includes('proposed solution') || titleLower.includes('solution concept')) {
+            sections[idx].text = `THEXRA delivers an integrated spatial computing framework tailored specifically for ${company}. By transforming ${process} into an interactive digital workflow, the platform mitigates physical risks and modernizes team operations.`;
+          } else if (titleLower.includes('target user')) {
+            sections[idx].text = `The solution is engineered specifically for ${clientInfo.targetPersona && clientInfo.targetPersona !== 'N/A' ? clientInfo.targetPersona : 'specialized clinical practitioners and resident surgeons'}, streamlining daily tasks and accelerating skill acquisition.`;
+          } else if (titleLower.includes('recommended technology') || titleLower.includes('tech')) {
+            sections[idx].text = `Deployment utilizes ${data.recommendedTechnology || 'THEXRA Spatial Assist'}, providing ultra-low latency rendering, spatial tracking, and enterprise cloud integration customized for ${company}.`;
+          } else if (titleLower.includes('scope of work') || titleLower.includes('sow')) {
+            sections[idx].text = `Scope encompasses end-to-end platform customization for ${company}, including spatial asset creation, cloud repository setup, administrative analytics dashboard integration, and technical user onboarding.`;
+          } else if (titleLower.includes('expected outcome') || titleLower.includes('benefit')) {
+            sections[idx].text = `Implementation directly addresses ${problem}, achieving measurable performance gains, up to a 40% decrease in operational friction, and full realization of ${outcome}.`;
+          } else if (titleLower.includes('timeline')) {
+            sections[idx].text = `Project rollout for ${company} is structured across a ${clientInfo.timeline && clientInfo.timeline !== 'N/A' ? clientInfo.timeline : '6-8 week'} phased plan, covering discovery, spatial design, iterative prototyping, QA testing, and production deployment.`;
+          } else if (titleLower.includes('next step')) {
+            sections[idx].text = `Recommended next step: Schedule a 30-minute technical scoping workshop with THEXRA solution architects to finalize API requirements and hardware allocations for ${company}.`;
+          } else {
+            sections[idx].text = `Customized ${sectionTitle} module for ${company}: Deploys THEXRA enterprise tools to streamline ${process} and achieve measurable operational improvements.`;
+          }
+        } finally {
+          renderEditorSections();
+        }
       });
     });
 
-    // 4. Add Section Handler
     document.getElementById('btn-add-section')?.addEventListener('click', () => {
-      sections.push({ title: `${sections.length + 1}. Custom Section`, text: "Enter custom section content here..." });
+      sections.push({ title: `${sections.length + 1}. Custom Section`, text: "Enter custom section details..." });
       renderEditorSections();
     });
 
-    // 5. Save Version Handler
     document.getElementById('btn-save-version')?.addEventListener('click', () => {
       const versionLabel = `Version ${savedVersions.length + 1} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
       savedVersions.push({ label: versionLabel, data: JSON.parse(JSON.stringify(sections)) });
@@ -607,7 +844,6 @@ function openProposalEditor(data, clientInfo) {
       renderEditorSections();
     });
 
-    // Load Version Handler
     document.getElementById('select-versions')?.addEventListener('change', (e) => {
       const idx = e.target.value;
       if (idx !== "" && savedVersions[idx]) {
@@ -619,7 +855,6 @@ function openProposalEditor(data, clientInfo) {
   }
 
   renderEditorSections();
-
   modal.style.display = 'block';
 
   document.getElementById('btn-modal-close')?.addEventListener('click', () => {
