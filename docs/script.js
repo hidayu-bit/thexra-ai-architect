@@ -366,19 +366,19 @@ intakeForm?.addEventListener('submit', async (e) => {
     return; // STOP execution
   }
 
-  // Build clientInfo with user values or N/A
+  // Build clientInfo mapping strictly to index.html IDs
   const clientInfo = {
-    companyName: companyInput?.value.trim() || 'N/A',
-    industry: industrySelect?.value.trim() || 'N/A',
-    location: document.getElementById('location')?.value.trim() || document.getElementById('hqLocation')?.value.trim() || 'N/A',
-    problem: problemInput?.value.trim() || 'N/A',
-    targetPersona: targetUsersInput?.value.trim() || 'N/A',
+    companyName: document.getElementById('company_name')?.value.trim() || 'N/A',
+    industry: document.getElementById('industryVertical')?.value.trim() || 'N/A',
+    location: document.getElementById('location')?.value.trim() || 'N/A',
+    problem: document.getElementById('problem')?.value.trim() || 'N/A',
+    targetPersona: document.getElementById('end_users')?.value.trim() || 'N/A',
     targetUserCount: targetUserRadio?.value || 'N/A',
-    currentProcess: document.getElementById('currentProcess')?.value.trim() || document.getElementById('operationalProcess')?.value.trim() || 'N/A',
-    desiredOutcome: outcomeInput?.value.trim() || 'N/A',
-    budgetRange: budgetSelect?.value.trim() || 'N/A',
-    timeline: timelineSelect?.value.trim() || 'N/A',
-    specialRequirements: document.getElementById('specialRequirements')?.value.trim() || 'N/A'
+    currentProcess: document.getElementById('current_process')?.value.trim() || 'N/A',
+    desiredOutcome: document.getElementById('outcomes')?.value.trim() || 'N/A',
+    budgetRange: document.getElementById('budget')?.value.trim() || 'N/A',
+    timeline: document.getElementById('timeline')?.value.trim() || 'N/A',
+    specialRequirements: document.getElementById('security')?.value.trim() || 'N/A'
   };
 
   const submitBtn = intakeForm.querySelector('button[type="submit"]');
@@ -675,14 +675,17 @@ function openProposalEditor(data, clientInfo) {
   const sections = [
     { title: "1. Executive Summary", text: `This executive proposal outlines the deployment of ${data.recommendedTechnology || 'THEXRA Spatial View'} for ${realCompany} to solve critical operational bottlenecks.` },
     { title: "2. Client Challenge", text: cleanText(data.businessProblem) },
-    { title: "3. Project Objective", text: cleanText(data.clientObjective) },
+    { title: "3. Project Objectives", text: cleanText(data.clientObjective) },
     { title: "4. Proposed Solution", text: cleanText(data.solutionConcept) },
-    { title: "5. Target Users", text: cleanText(data.targetUsers) },
-    { title: "6. Recommended Technology", text: cleanText(data.recommendedTechnology) },
-    { title: "7. Scope of Work (SOW)", text: cleanText(data.scopeOfWork?.projectScope || 'Project scope boundaries and deliverable framework.') },
-    { title: "8. Expected Outcomes", text: cleanText(data.expectedBenefits) },
-    { title: "9. Timeline", text: clientInfo.timeline || "6-8 weeks" },
-    { title: "10. Recommended Next Steps", text: cleanText(data.recommendedNextStep) }
+    { title: "5. User Experience", text: `Intuitive spatial interface engineered specifically for ${cleanText(data.targetUsers)}, accelerating user onboarding and minimizing operational learning curves.` },
+    { title: "6. Solution Architecture", text: cleanText(data.solutionArchitecture?.solutionOverview || 'Cloud-managed spatial edge architecture with secure API integration and real-time telemetry.') },
+    { title: "7. Scope of Work", text: cleanText(data.scopeOfWork?.projectScope || 'Project scope boundaries and deliverable framework.') },
+    { title: "8. Deliverables", text: Array.isArray(data.scopeOfWork?.deliverables) ? data.scopeOfWork.deliverables.join('\n') : 'THEXRA Platform Access, Admin Portal, Onboarding Documentation' },
+    { title: "9. Implementation Plan", text: renderImplementationPlan(data.implementationPlan, false) ? 'Phase 1: Discovery & Architecture\nPhase 2: Spatial Customization\nPhase 3: Integration & Testing\nPhase 4: Final Deployment' : 'Structured multi-phase implementation roadmap.' },
+    { title: "10. Timeline", text: clientInfo.timeline || "3-6 months" },
+    { title: "11. Assumptions", text: "1. Key stakeholder availability for bi-weekly milestone sign-offs.\n2. Sandbox environment API credentials provided during Phase 1." },
+    { title: "12. Optional Add-ons", text: "1. Premium 24/7 SLA Technical Support\n2. Advanced Custom Analytics Dashboard\n3. On-Site Staff Training Workshops" },
+    { title: "13. Next Steps", text: cleanText(data.recommendedNextStep) }
   ];
 
   function renderEditorSections() {
@@ -809,20 +812,26 @@ CRITICAL INSTRUCTIONS:
             sections[idx].text = `${company} currently experiences severe operational friction caused by ${problem}. Continued reliance on ${process} limits scaling and increases overall execution risk.`;
           } else if (titleLower.includes('objective') || titleLower.includes('goal')) {
             sections[idx].text = `The strategic goal for ${company} is to replace ${process} with an automated spatial platform, unlocking "${outcome}" across key operational performance metrics.`;
-          } else if (titleLower.includes('proposed solution') || titleLower.includes('solution concept')) {
+          } else if (titleLower.includes('proposed solution') || titleLower.includes('concept')) {
             sections[idx].text = `THEXRA delivers an integrated spatial computing framework tailored specifically for ${company}. By transforming ${process} into an interactive digital workflow, the platform mitigates physical risks and modernizes team operations.`;
-          } else if (titleLower.includes('target user')) {
-            sections[idx].text = `The solution is engineered specifically for ${clientInfo.targetPersona && clientInfo.targetPersona !== 'N/A' ? clientInfo.targetPersona : 'specialized clinical practitioners and resident surgeons'}, streamlining daily tasks and accelerating skill acquisition.`;
-          } else if (titleLower.includes('recommended technology') || titleLower.includes('tech')) {
-            sections[idx].text = `Deployment utilizes ${data.recommendedTechnology || 'THEXRA Spatial Assist'}, providing ultra-low latency rendering, spatial tracking, and enterprise cloud integration customized for ${company}.`;
+          } else if (titleLower.includes('user experience') || titleLower.includes('ux')) {
+            sections[idx].text = `Tailored user interface engineered for ${clientInfo.targetPersona && clientInfo.targetPersona !== 'N/A' ? clientInfo.targetPersona : 'end users'}, featuring zero-install accessibility and interactive spatial controls.`;
+          } else if (titleLower.includes('architecture')) {
+            sections[idx].text = `Scalable enterprise cloud architecture custom-engineered for ${company}, featuring edge rendering, encrypted data pipelines, and telemetry dashboards.`;
           } else if (titleLower.includes('scope of work') || titleLower.includes('sow')) {
             sections[idx].text = `Scope encompasses end-to-end platform customization for ${company}, including spatial asset creation, cloud repository setup, administrative analytics dashboard integration, and technical user onboarding.`;
-          } else if (titleLower.includes('expected outcome') || titleLower.includes('benefit')) {
-            sections[idx].text = `Implementation directly addresses ${problem}, achieving measurable performance gains, up to a 40% decrease in operational friction, and full realization of ${outcome}.`;
+          } else if (titleLower.includes('deliverables')) {
+            sections[idx].text = `1. Custom THEXRA Enterprise License\n2. Administrative Analytics Portal Access\n3. User Onboarding & Operations Documentation\n4. SLA Technical Support Integration`;
+          } else if (titleLower.includes('plan')) {
+            sections[idx].text = `Phase 1: Discovery & Requirements Audit (Weeks 1-2)\nPhase 2: Platform Customization (Weeks 3-5)\nPhase 3: Integration & UAT (Weeks 6-7)\nPhase 4: Production Release (Week 8+)`;
           } else if (titleLower.includes('timeline')) {
-            sections[idx].text = `Project rollout for ${company} is structured across a ${clientInfo.timeline && clientInfo.timeline !== 'N/A' ? clientInfo.timeline : '6-8 week'} phased plan, covering discovery, spatial design, iterative prototyping, QA testing, and production deployment.`;
+            sections[idx].text = `Project rollout for ${company} is structured across a ${clientInfo.timeline && clientInfo.timeline !== 'N/A' ? clientInfo.timeline : '3-6 month'} phased plan, covering discovery, design, prototyping, QA testing, and production deployment.`;
+          } else if (titleLower.includes('assumptions')) {
+            sections[idx].text = `1. ${company} provides access to necessary sandbox APIs during Phase 1.\n2. Key project stakeholders attend weekly progress reviews.`;
+          } else if (titleLower.includes('add-on') || titleLower.includes('optional')) {
+            sections[idx].text = `1. Dedicated On-Premises Air-Gapped Deployment\n2. 24/7 SLA Priority Support\n3. Bi-Annual Custom Feature Upgrades`;
           } else if (titleLower.includes('next step')) {
-            sections[idx].text = `Recommended next step: Schedule a 30-minute technical scoping workshop with THEXRA solution architects to finalize API requirements and hardware allocations for ${company}.`;
+            sections[idx].text = `Recommended next step: Schedule a 30-minute technical scoping review with THEXRA solution architects and ${company} leadership.`;
           } else {
             sections[idx].text = `Customized ${sectionTitle} module for ${company}: Deploys THEXRA enterprise tools to streamline ${process} and achieve measurable operational improvements.`;
           }
@@ -856,6 +865,67 @@ CRITICAL INSTRUCTIONS:
 
   renderEditorSections();
   modal.style.display = 'block';
+
+  document.addEventListener('click', (e) => {
+    const isDownloadBtn = e.target.id === 'btn-modal-print' ||
+      e.target.innerText?.includes('Export to PDF') ||
+      e.target.closest('#btn-modal-print');
+
+    if (!isDownloadBtn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Directly read id="company_name" and id="industryVertical" from index.html
+    const companyInput = document.getElementById('company_name')?.value?.trim();
+    const industryInput = document.getElementById('industryVertical')?.value?.trim();
+
+    const clientName = companyInput || 'Client Organization';
+    const projectTitle = companyInput
+      ? `${companyInput} - ${industryInput || 'Enterprise'} Solution Proposal`
+      : 'Enterprise Solution Proposal';
+
+    const todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const proposalContent = document.getElementById('proposalContent') ||
+      document.getElementById('editorSectionsContainer') ||
+      document.querySelector('.modal-body');
+
+    if (proposalContent) {
+      let existingHeader = proposalContent.querySelector('.print-header-metadata');
+      if (existingHeader) existingHeader.remove();
+
+      const headerMeta = document.createElement('div');
+      headerMeta.className = 'print-header-metadata';
+      headerMeta.innerHTML = `
+        <div style="border-bottom: 2px solid #2563EB; padding-bottom: 12px; margin-bottom: 20px; font-family: Arial, sans-serif; width: 100%;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                <tr>
+                    <td style="vertical-align: middle;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 26px; height: 26px; background: #2563EB; color: #ffffff; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;">T</div>
+                            <span style="color: #1E3A8A; font-size: 18px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap;">THEXRA ENTERPRISE SOLUTIONS</span>
+                        </div>
+                    </td>
+                    <td style="text-align: right; vertical-align: middle;">
+                        <span style="font-size: 11px; font-weight: 700; color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 4px 10px; border-radius: 4px; white-space: nowrap; text-transform: uppercase;">SOLUTION PROPOSAL</span>
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%; border-collapse: collapse; background: #F8FAFC; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #334155;">
+                <tr>
+                    <td style="padding: 6px 10px; width: 33%;"><strong>Client:</strong> ${clientName}</td>
+                    <td style="padding: 6px 10px; width: 42%;"><strong>Project:</strong> ${projectTitle}</td>
+                    <td style="padding: 6px 10px; width: 25%; text-align: right;"><strong>Date:</strong> ${todayDate}</td>
+                </tr>
+            </table>
+        </div>
+      `;
+      proposalContent.prepend(headerMeta);
+    }
+
+    window.print();
+  });
 
   document.getElementById('btn-modal-close')?.addEventListener('click', () => {
     modal.style.display = 'none';

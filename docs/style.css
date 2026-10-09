@@ -444,23 +444,47 @@ button[type="submit"]:disabled {
     padding: 8px 10px !important;
 }
 
-/* Printable PDF Export Optimixation */
 @media print {
 
-    /*1. Hide background UI and scrollbars */
+    /* 1. Hide UI elements, buttons, modal headers, and empty container blocks */
+    .no-print,
+    .modal-header,
+    .btn-regenerate,
+    .btn-delete,
+    #addSectionBtn,
+    #saveVersionBtn,
+    .version-selector,
+    #btn-modal-print,
+    #btn-modal-close,
+    button,
+    select,
+    .badge,
+    .subtitle,
+    #proposalModal h2,
+    #proposalModal p:has(+ #editorSectionsContainer),
+    div:empty {
+        display: none !important;
+    }
+
+    /* 2. Reset document container to allow natural height without trailing blank pages */
+    html,
     body {
         background: #ffffff !important;
         color: #0f172a !important;
         margin: 0 !important;
         padding: 0 !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
     }
 
     body * {
         visibility: hidden;
     }
 
-    /*2. Show only proposal content and force full page width */
+    /* 3. Render ONLY proposal content */
     #proposalModal,
+    #proposalModal *,
     #proposalContent,
     #proposalContent * {
         visibility: visible !important;
@@ -472,6 +496,7 @@ button[type="submit"]:disabled {
         top: 0 !important;
         width: 100% !important;
         height: auto !important;
+        max-height: none !important;
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -480,40 +505,40 @@ button[type="submit"]:disabled {
     }
 
     #proposalContent {
-        position: relative !important;
         width: 100% !important;
         max-width: 100% !important;
-        padding: 0 !important;
+        padding: 20px !important;
         margin: 0 !important;
-        box-sizing: border-box !important;
+        background: #ffffff !important;
     }
 
-    /*3. Fix System Flow Diagram in PDF view */
-    #proposalContent div[style*="overflow-x"] {
-        overflow: visible !important;
-    }
-
-    /* Ensure node cards scale cleanly across printable page width */
-    #proposalContent div[style*="display: flex"]{
-        width: 100% !important;
-        justify-content: space-between !important;
-    }
-
-    /*4. Page break & clean borders for 13 sections proposal template */
-    .proposal-template-grid {
-        gap: 12px !important;
-    }
-
-    .proposal-section {
+    /* 4. Convert textareas and inputs into clean plain document text */
+    textarea,
+    input[type="text"] {
+        border: none !important;
+        background: transparent !important;
+        color: #0f172a !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        resize: none !important;
         box-shadow: none !important;
-        border: 1px solid #CBD5E1 !important;
+        outline: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* 5. Clean page breaks for sections */
+    .proposal-section,
+    .glass-card {
+        border: none !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 10px 0 !important;
+        margin-bottom: 10px !important;
         page-break-inside: avoid !important;
     }
-
-    .section-label {
-        color: #0F172A !important;
-    }
-
 }
 
 html {
