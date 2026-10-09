@@ -117,9 +117,16 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Client-Grounded Fallback Mechanism:** Engineered a robust local fallback engine to seamlessly handle API rate limits (503/429) while preserving full client context.
 - **Syntax & UI Stabilization:** Fixed critical print event listener.
 
-## Day 18 —  Proposal Editor V1
+## Day 18 — Proposal Editor V1
 - **Web-Based Editor V1:** Delivered a modal interface for real-time proposal customization and preview.
 - **Section Controls:** Added live editing (`Edit`), section removal (`Delete`), and custom section addition (`Add`).
 - **Granular AI Regeneration:** Integrated async `gemini-3.8-flash` handlers to rewrite individual sections on demand.
 - **Snapshot Versioning:** Built a version management system (`Save version`) to capture and restore proposal drafts
 - **Zero-Placeholder Reliability:** Sanitized input fallbacks to ensure clean outputs with zero `N/A` strings.
+
+## Day 19 — Proposal Export
+- **Basic Export Setup:** Added initial PDF export via browser print and basic save solution `.doc` brief file downloads.
+- **Header & Metadata Layout:** Placed THEXRA logo and aligned Client, Project, and Date metadata onto a single row.
+- **Print CSS Adjustments:** Applied `@media print` rules to hide UI buttons, clean up margins, and add basic page numbers.
+- **Diagram Tweaks:** Updated the 5-step flow diagram with clearer step colors and softer card borders.
+- **Format Review:** Checked exported documents to ensure they meet basic internal sales review standards.

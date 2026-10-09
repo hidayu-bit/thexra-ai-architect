@@ -576,6 +576,24 @@ button[type="submit"]:disabled {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
     }
+
+    @page {
+        margin: 15mm;
+
+        @bottom-left {
+            content: "© " attr(data-year) " THEXRA. All rights reserved.";
+            font-size: 8pt;
+            font-family: Arial, sans-serif;
+            color: #64748B;
+        }
+
+        @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 9pt;
+            font-family: Arial, sans-serif;
+            color: #64748B;
+        }
+    }
 }
 
 html {

@@ -41,19 +41,24 @@ const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 function renderArchitectureDiagram(architectureData, isProposal = false) {
   if (!architectureData) return '';
 
-  const hw = (architectureData.hardware || [])[0] || 'Client Device';
-  const xr = (architectureData.xrComponents || [])[0] || 'Interactive Visuals';
-  const sw = (architectureData.software || [])[0] || 'THEXRA Platform';
-  const aiComponents = (architectureData.aiComponents || [])[0] || 'Smart Automation';
-  const backend = (architectureData.backend || [])[0] || 'Secure Cloud Storage';
-  const dash = (architectureData.dashboard || [])[0] || 'Reporting Portal';
+  // Get current company/industry context from form if available
+  const company = document.getElementById('company_name')?.value?.trim() || 'Client';
+  const industry = document.getElementById('industryVertical')?.value?.trim() || 'Enterprise';
+
+  // Smart extractions with rich contextual defaults
+  const hw = (architectureData.hardware || []).filter(Boolean).join(', ') || `${company} Workstations & Mobile Devices`;
+  const xr = (architectureData.xrComponents || []).filter(Boolean).join(', ') || `Interactive ${industry} UI`;
+  const sw = (architectureData.software || []).filter(Boolean).join(', ') || `THEXRA ${industry} Engine`;
+  const aiComponents = (architectureData.aiComponents || []).filter(Boolean).join(', ') || 'Automated Process Engine';
+  const backend = (architectureData.backend || []).filter(Boolean).join(', ') || 'Secure Enterprise Cloud';
+  const dash = (architectureData.dashboard || []).filter(Boolean).join(', ') || 'Real-Time Analytics Portal';
 
   const steps = [
     { label: 'Step 1: Device', val: hw, color: '#38BDF8', border: isProposal ? '#38BDF8' : 'rgba(56, 189, 248, 0.3)' },
-    { label: 'Step 2: Experience', val: xr, color: '#38BDF8', border: isProposal ? '#38BDF8' : 'rgba(56, 189, 248, 0.3)' },
-    { label: 'Step 3: App & AI', val: `${sw} (${aiComponents})`, color: isProposal ? '#9333EA' : '#C084FC', border: isProposal ? '#C084FC' : 'rgba(192, 132, 252, 0.3)' },
-    { label: 'Step 4: Cloud & DB', val: backend, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' },
-    { label: 'Step 5: Dashboard', val: dash, color: isProposal ? '#059669' : '#34D399', border: isProposal ? '#059669' : '#34D399' }
+    { label: 'Step 2: Experience', val: xr, color: '#F43F5E', border: isProposal ? '#38BDF8' : 'rgba(56, 189, 248, 0.3)' },
+    { label: 'Step 3: App & AI', val: `${sw} (${aiComponents})`, color: '#C084FC', border: isProposal ? '#C084FC' : 'rgba(192, 132, 252, 0.3)' },
+    { label: 'Step 4: Cloud & DB', val: backend, color: '#F59E0B', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' },
+    { label: 'Step 5: Dashboard', val: dash, color: '#34D399', border: isProposal ? '#34D399' : 'rgba(52, 211, 153, 0.3)' }
   ];
 
   const cardBg = isProposal ? '#FFFFFF' : 'rgba(255, 255, 255, 0.05)';
@@ -441,15 +446,15 @@ CRITICAL FORMAT & GROUNDING RULES:
   "expectedBenefits": "Concrete operational outcomes focusing on ${clientInfo.desiredOutcome}.",
   "why": "Sentence 1 explaining why the technology category addresses ${clientInfo.problem}. Sentence 2 explaining why THEXRA suits ${clientInfo.companyName}.",
   "solutionArchitecture": {
-    "solutionOverview": "Technical overview framework",
+    "solutionOverview": "Specific 1-sentence technical architecture overview tailored for ${clientInfo.companyName} in ${clientInfo.industry}.",
     "userJourney": "${clientInfo.targetPersona} authenticates -> Scans workspace -> Executes digitized ${clientInfo.currentProcess} workflow -> Syncs real-time data.",
-    "hardware": ["Enterprise Devices"],
-    "software": ["THEXRA Core Module"],
-    "aiComponents": ["Automated Process Engine"],
-    "xrComponents": ["Interactive Spatial UI"],
-    "backend": ["Secure Enterprise Cloud"],
-    "dashboard": ["Analytics Portal"],
-    "dataFlow": "Device -> Edge -> Cloud -> Analytics"
+    "hardware": ["Specific Hardware Model/Device tailored for ${clientInfo.companyName}"],
+    "software": ["THEXRA ${clientInfo.industry} Module"],
+    "aiComponents": ["Specific AI Automation Engine for ${clientInfo.problem}"],
+    "xrComponents": ["Custom Spatial UI for ${clientInfo.companyName}"],
+    "backend": ["Enterprise Cloud Repository"],
+    "dashboard": ["Real-time Operational Dashboard"],
+    "dataFlow": "Edge Device -> Secure API Gateway -> Analytics Engine -> Executive Dashboard"
   },
   "implementationApproach": ["Phase 1 description", "Phase 2 description", "Phase 3 description"],
   "implementationPlan": [
@@ -624,19 +629,46 @@ function renderBriefOutput(data, clientInfo) {
   // Action Button Handlers
   document.getElementById('btn-save')?.addEventListener('click', (e) => {
     e.preventDefault();
-    e.stopPropagation();// Prevents page auto-refresh!
+    e.stopPropagation();
 
+    const arch = data.solutionArchitecture || {};
     const htmlDoc = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset="utf-8"><title>THEXRA Solution Brief</title></head>
-      <body>
-        <h1>THEXRA ENTERPRISE SOLUTION BRIEF</h1>
-        <h2>1. Client Problem Statement</h2><p>${cleanText(data.businessProblem)}</p>
-        <h2>2. Proposed Solution</h2><p>${cleanText(data.solutionConcept)}</p>
-        <h2>3. Technology Selection</h2><p>${cleanText(data.recommendedTechnology)}</p>
+      <body style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1 style="color: #1E3A8A; border-bottom: 2px solid #2563EB; padding-bottom: 8px;">THEXRA ENTERPRISE SOLUTION BRIEF</h1>
+        
+        <h2 style="color: #2563EB;">1. Client Problem Statement</h2>
+        <p>${cleanText(data.businessProblem)}</p>
+        <p><strong>Target Users:</strong> ${cleanText(data.targetUsers || 'N/A')}</p>
+        
+        <h2 style="color: #2563EB;">2. AI Analysis & Rationale</h2>
+        <p><em>"${cleanText(data.why)}"</em></p>
+        
+        <h2 style="color: #2563EB;">3. Recommended Solution Concept</h2>
+        <p>${cleanText(data.solutionConcept)}</p>
+        
+        <h2 style="color: #2563EB;">4. Technology Selection & Architecture</h2>
+        <h3>${cleanText(data.recommendedTechnology)}</h3>
+        <p><strong>Overview:</strong> ${cleanText(arch.solutionOverview || 'N/A')}</p>
+        <p><strong>User Journey:</strong> ${cleanText(arch.userJourney || 'N/A')}</p>
+        <p><strong>Hardware:</strong> ${(arch.hardware || []).join(', ') || 'N/A'}</p>
+        <p><strong>Software:</strong> ${(arch.software || []).join(', ') || 'N/A'}</p>
+        <p><strong>AI Components:</strong> ${(arch.aiComponents || []).join(', ') || 'N/A'}</p>
+        <p><strong>XR Components:</strong> ${(arch.xrComponents || []).join(', ') || 'N/A'}</p>
+        <p><strong>Backend:</strong> ${(arch.backend || []).join(', ') || 'N/A'}</p>
+        <p><strong>Dashboard:</strong> ${(arch.dashboard || []).join(', ') || 'N/A'}</p>
+        <p><strong>Data Flow:</strong> ${cleanText(arch.dataFlow || 'N/A')}</p>
+        
+        <h2 style="color: #2563EB;">5. Expected Business Outcomes</h2>
+        <p>${cleanText(data.expectedBenefits)}</p>
+        
+        <h2 style="color: #2563EB;">6. Recommended Next Step</h2>
+        <p>${cleanText(data.recommendedNextStep)}</p>
       </body>
       </html>
     `;
+
     const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
     const fileName = `THEXRA-Solution-Brief-${Date.now()}.doc`;
     const link = document.createElement('a');
@@ -645,7 +677,6 @@ function renderBriefOutput(data, clientInfo) {
     link.click();
     URL.revokeObjectURL(link.href);
 
-    // Smooth status banner message (No page refresh, no alert popups!)
     if (statusBanner) {
       statusBanner.className = 'status-banner success';
       statusBanner.innerText = `Brief saved as ${fileName}! Check your browser downloads.`;
