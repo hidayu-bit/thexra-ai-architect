@@ -7,6 +7,13 @@ let industryKnowledge = {};
 // Global helper to clean whitespace safely everywhere
 const cleanText = (str) => (str || '').replace(/\s+/g, ' ').trim();
 
+// Force browser to cache and decode the logo immediately on page load
+const logoPreload = new Image();
+logoPreload.src = 'thexralogo.jpg';
+if ('decode' in logoPreload) {
+  logoPreload.decode().catch(() => { });
+}
+
 // Load Knowledge Bases asynchronously
 async function loadKnowledgeBases() {
   try {
@@ -615,7 +622,10 @@ function renderBriefOutput(data, clientInfo) {
   `;
 
   // Action Button Handlers
-  document.getElementById('btn-save')?.addEventListener('click', () => {
+  document.getElementById('btn-save')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();// Prevents page auto-refresh!
+
     const htmlDoc = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset="utf-8"><title>THEXRA Solution Brief</title></head>
@@ -628,11 +638,19 @@ function renderBriefOutput(data, clientInfo) {
       </html>
     `;
     const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
+    const fileName = `THEXRA-Solution-Brief-${Date.now()}.doc`;
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `THEXRA-Solution-Brief-${Date.now()}.doc`;
+    link.download = fileName;
     link.click();
     URL.revokeObjectURL(link.href);
+
+    // Smooth status banner message (No page refresh, no alert popups!)
+    if (statusBanner) {
+      statusBanner.className = 'status-banner success';
+      statusBanner.innerText = `Brief saved as ${fileName}! Check your browser downloads.`;
+      statusBanner.style.display = 'block';
+    }
   });
 
   document.getElementById('btn-edit')?.addEventListener('click', () => {
@@ -672,6 +690,15 @@ function openProposalEditor(data, clientInfo) {
     ? clientInfo.companyName
     : 'Client Organization';
 
+  // Dynamic header metadata calculations
+  const companyInput = document.getElementById('company_name')?.value?.trim();
+  const industryInput = document.getElementById('industryVertical')?.value?.trim();
+  const clientName = companyInput || realCompany;
+  const projectTitle = companyInput
+    ? `${companyInput} - ${industryInput || 'Enterprise'} Solution Proposal`
+    : 'Enterprise Solution Proposal';
+  const todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
   const sections = [
     { title: "1. Executive Summary", text: `This executive proposal outlines the deployment of ${data.recommendedTechnology || 'THEXRA Spatial View'} for ${realCompany} to solve critical operational bottlenecks.` },
     { title: "2. Client Challenge", text: cleanText(data.businessProblem) },
@@ -690,6 +717,31 @@ function openProposalEditor(data, clientInfo) {
 
   function renderEditorSections() {
     content.innerHTML = `
+      <!-- 1. Executive Print Header (Injected upon opening modal) -->
+      <div class="print-header-metadata" style="border-bottom: 2px solid #2563EB; padding-bottom: 12px; margin-bottom: 20px; font-family: Arial, sans-serif; width: 100%;">
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+              <tr>
+                  <td style="vertical-align: middle;">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                          <img src="thexralogo.jpg" alt="THEXRA Logo" class="thexra-print-logo" style="height: 28px; width: auto; max-height: 28px; object-fit: contain; display: inline-block; vertical-align: middle;" />
+                          <span style="color: #1E3A8A; font-size: 18px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; vertical-align: middle;">THEXRA ENTERPRISE SOLUTIONS</span>
+                      </div>
+                  </td>
+                  <td style="text-align: right; vertical-align: middle;">
+                      <span style="font-size: 11px; font-weight: 700; color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 4px 10px; border-radius: 4px; white-space: nowrap; text-transform: uppercase;">SOLUTION PROPOSAL</span>
+                  </td>
+              </tr>
+          </table>
+          <table style="width: 100%; border-collapse: collapse; background: #F8FAFC; border-radius: 6px; font-size: 11px; color: #334155;">
+            <tr>
+                <td style="padding: 6px 8px; width: 28%; vertical-align: top;"><strong>Client:</strong> ${clientName}</td>
+                <td style="padding: 6px 8px; width: 52%; vertical-align: top;"><strong>Project:</strong> ${projectTitle}</td>
+                <td style="padding: 6px 8px; width: 20%; text-align: right; vertical-align: top; white-space: nowrap;"><strong>Date:</strong> ${todayDate}</td>
+            </tr>
+        </table>
+      </div>
+
+      <!-- 2. Proposal Editor Controls -->
       <div style="display: flex; flex-direction: column; gap: 14px; text-align: left; font-family: inherit;">
         
         <div style="display: flex; justify-content: space-between; align-items: center; background: #F1F5F9; padding: 10px 12px; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
@@ -866,6 +918,7 @@ CRITICAL INSTRUCTIONS:
   renderEditorSections();
   modal.style.display = 'block';
 
+  // Direct print click handler with download popup notification
   document.addEventListener('click', (e) => {
     const isDownloadBtn = e.target.id === 'btn-modal-print' ||
       e.target.innerText?.includes('Export to PDF') ||
@@ -876,57 +929,15 @@ CRITICAL INSTRUCTIONS:
     e.preventDefault();
     e.stopPropagation();
 
-    // Directly read id="company_name" and id="industryVertical" from index.html
-    const companyInput = document.getElementById('company_name')?.value?.trim();
-    const industryInput = document.getElementById('industryVertical')?.value?.trim();
-
-    const clientName = companyInput || 'Client Organization';
-    const projectTitle = companyInput
-      ? `${companyInput} - ${industryInput || 'Enterprise'} Solution Proposal`
-      : 'Enterprise Solution Proposal';
-
-    const todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-    const proposalContent = document.getElementById('proposalContent') ||
-      document.getElementById('editorSectionsContainer') ||
-      document.querySelector('.modal-body');
-
-    if (proposalContent) {
-      let existingHeader = proposalContent.querySelector('.print-header-metadata');
-      if (existingHeader) existingHeader.remove();
-
-      const headerMeta = document.createElement('div');
-      headerMeta.className = 'print-header-metadata';
-      headerMeta.innerHTML = `
-        <div style="border-bottom: 2px solid #2563EB; padding-bottom: 12px; margin-bottom: 20px; font-family: Arial, sans-serif; width: 100%;">
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
-                <tr>
-                    <td style="vertical-align: middle;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="width: 26px; height: 26px; background: #2563EB; color: #ffffff; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;">T</div>
-                            <span style="color: #1E3A8A; font-size: 18px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap;">THEXRA ENTERPRISE SOLUTIONS</span>
-                        </div>
-                    </td>
-                    <td style="text-align: right; vertical-align: middle;">
-                        <span style="font-size: 11px; font-weight: 700; color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 4px 10px; border-radius: 4px; white-space: nowrap; text-transform: uppercase;">SOLUTION PROPOSAL</span>
-                    </td>
-                </tr>
-            </table>
-            <table style="width: 100%; border-collapse: collapse; background: #F8FAFC; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #334155;">
-                <tr>
-                    <td style="padding: 6px 10px; width: 33%;"><strong>Client:</strong> ${clientName}</td>
-                    <td style="padding: 6px 10px; width: 42%;"><strong>Project:</strong> ${projectTitle}</td>
-                    <td style="padding: 6px 10px; width: 25%; text-align: right;"><strong>Date:</strong> ${todayDate}</td>
-                </tr>
-            </table>
-        </div>
-      `;
-      proposalContent.prepend(headerMeta);
-    }
+    // Listen for when the user completes or cancels the print/save dialog
+    window.addEventListener('afterprint', () => {
+      // 1. Show alert popup
+      alert('Proposal export complete!\n\nIf you clicked Save, your PDF is now stored in your downloads folder.'
+      );
+    }, { once: true }); // { once: true } ensures the popup only triggers once per print
 
     window.print();
   });
-
   document.getElementById('btn-modal-close')?.addEventListener('click', () => {
     modal.style.display = 'none';
   });

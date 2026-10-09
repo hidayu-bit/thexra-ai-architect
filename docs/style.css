@@ -446,11 +446,17 @@ button[type="submit"]:disabled {
 
 @media print {
 
-    /* 1. Hide UI elements, buttons, modal headers, and empty container blocks */
+    /* 1. Hide the background intake container, UI elements, buttons, and subheaders */
+    .container,
     .no-print,
     .modal-header,
     .btn-regenerate,
     .btn-delete,
+    .btn-regen-sec,
+    .btn-del-sec,
+    #btn-add-section,
+    #btn-save-version,
+    #select-versions,
     #addSectionBtn,
     #saveVersionBtn,
     .version-selector,
@@ -461,12 +467,12 @@ button[type="submit"]:disabled {
     .badge,
     .subtitle,
     #proposalModal h2,
-    #proposalModal p:has(+ #editorSectionsContainer),
+    #proposalModal p,
     div:empty {
         display: none !important;
     }
 
-    /* 2. Reset document container to allow natural height without trailing blank pages */
+    /* 2. Reset html/body to fit exact content height without extra blank pages */
     html,
     body {
         background: #ffffff !important;
@@ -474,7 +480,7 @@ button[type="submit"]:disabled {
         margin: 0 !important;
         padding: 0 !important;
         height: auto !important;
-        min-height: auto !important;
+        min-height: 0 !important;
         overflow: visible !important;
     }
 
@@ -482,7 +488,7 @@ button[type="submit"]:disabled {
         visibility: hidden;
     }
 
-    /* 3. Render ONLY proposal content */
+    /* 3. Render ONLY proposal modal content */
     #proposalModal,
     #proposalModal *,
     #proposalContent,
@@ -512,32 +518,63 @@ button[type="submit"]:disabled {
         background: #ffffff !important;
     }
 
-    /* 4. Convert textareas and inputs into clean plain document text */
-    textarea,
-    input[type="text"] {
-        border: none !important;
-        background: transparent !important;
-        color: #0f172a !important;
-        font-size: 14px !important;
-        line-height: 1.5 !important;
-        resize: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: auto !important;
+    /* Ensure Print Header & Logo Remain Visible */
+    .print-header-metadata,
+    .print-header-metadata *,
+    .thexra-print-logo,
+    img {
+        visibility: visible !important;
+        display: inline-block !important;
     }
 
-    /* 5. Clean page breaks for sections */
+    /* 4. Convert section cards, textareas, and inputs into clean document text */
+    .editor-section-card,
     .proposal-section,
     .glass-card {
         border: none !important;
         border-bottom: 1px solid #E2E8F0 !important;
         background: transparent !important;
         box-shadow: none !important;
-        padding: 10px 0 !important;
+        padding: 8px 0 !important;
         margin-bottom: 10px !important;
         page-break-inside: avoid !important;
+    }
+
+    .sec-title-input {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        color: #0F172A !important;
+    }
+
+    textarea,
+    textarea.sec-text-input,
+    input[type="text"] {
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        color: #0f172a !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        resize: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .print-header-metadata table {
+        width: 100% !important;
+        table-layout: fixed !important;
+    }
+
+    .print-header-metadata td {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 }
 
