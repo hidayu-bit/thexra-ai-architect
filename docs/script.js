@@ -428,29 +428,29 @@ Desired Business Outcome: ${clientInfo.desiredOutcome}
 Budget Range: ${clientInfo.budgetRange}
 Target Timeline: ${clientInfo.timeline}
 
-CRITICAL FORMAT & GROUNDING RULES:
-1. "recommendedTechnology": You MUST analyze the specific Core Business Problem (${clientInfo.problem}) alongside the Suitable Technologies from ${industryContext}. Select the single technology category that directly solves this exact problem (e.g., use VR for simulation/training/hazards, MR for surgical/remote/hands-free assistance, AR for visual overlays/wayfinding, Digital Twin for prototyping/facilities, or AI for predictive analytics/data). Format: "[Category] — THEXRA [Product Name] (${clientInfo.industry} Edition)".
-2. "why": Exactly 2 concise sentences: (1) Why tech category solves ${clientInfo.problem}, (2) Why THEXRA suits ${clientInfo.companyName}.
-3. "implementationPlan": MUST contain exactly 7 sequential stages: Discovery, Design, Prototype, Development, Testing, Deployment, Support. 
-   - Durations MUST be formatted cleanly (e.g., "1 week", "1.5 weeks", "2 weeks", "Ongoing").
-   - Deliverables MUST be straightforward, clear business items that anyone can understand.
-   - Cumulative time across stages 1 to 6 MUST strictly fit the target timeline (${clientInfo.timeline}).
-4. DO NOT output code blocks, system confirmation phrases, or chatter. Return ONLY raw valid JSON matching this schema:
+CRITICAL FORMAT, PARAPHRASING & GROUNDING RULES:
+1. MANDATORY PARAPHRASING: Never copy raw intake text verbatim or wrap user problem strings in literal quotation marks. Rephrase all client challenges into executive-grade corporate prose.
+2. "recommendedTechnology": Select the single technology category from ${industryContext} that directly solves ${clientInfo.problem}. Format: "[Category] — THEXRA [Product Name] (${clientInfo.industry} Edition)".
+3. "userJourney": Construct a fluid, active operational workflow using action verbs. NEVER directly concatenate raw input strings into the template.
+4. "scopeOfWork": Must strictly use action-oriented execution verbs (e.g., "Deploy, configure, integrate, test, and deliver..."). Do NOT restate the client problem description or use "automate [currentProcess]".
+5. DYNAMIC INDUSTRY ADAPTATION: Tailor hardware, software modules, regulatory assumptions, and deliverables to ${clientInfo.industry} (e.g., 21 CFR Part 11 for Pharma, ATEX/Class 1 Div 1 for Energy, Air-gapped networking for Defense, WebXR for Retail/Tourism).
+6. "implementationPlan": Exactly 7 sequential stages (Discovery, Design, Prototype, Development, Testing, Deployment, Support). Cumulative durations across stages 1 to 6 MUST strictly fit ${clientInfo.timeline}.
+7. Return ONLY raw valid JSON matching this schema:
 
 {
-  "businessProblem": "Detailed summary of ${clientInfo.companyName}'s problem in ${clientInfo.industry}, specifically how ${clientInfo.currentProcess} creates bottlenecks.",
-  "clientObjective": "Specific goal to achieve ${clientInfo.desiredOutcome} for ${clientInfo.targetPersona} within ${clientInfo.timeline}.",
+  "businessProblem": "Detailed summary of ${clientInfo.companyName}'s problem in ${clientInfo.industry}, specifically how current manual operational limitations create severe business bottlenecks.",
+  "clientObjective": "Specific quantifiable objective to achieve target business outcomes for ${clientInfo.targetPersona} within ${clientInfo.timeline}.",
   "recommendedTechnology": "[Category] — THEXRA [Product Name] (${clientInfo.industry} Edition)",
-  "solutionConcept": "High-level architectural concept explaining how THEXRA replaces ${clientInfo.currentProcess} to solve ${clientInfo.problem}.",
+  "solutionConcept": "High-level architectural concept explaining how THEXRA replaces existing manual workflows to solve core operational bottlenecks.",
   "targetUsers": "${clientInfo.targetPersona} (${clientInfo.targetUserCount} active users)",
-  "expectedBenefits": "Concrete operational outcomes focusing on ${clientInfo.desiredOutcome}.",
-  "why": "Sentence 1 explaining why the technology category addresses ${clientInfo.problem}. Sentence 2 explaining why THEXRA suits ${clientInfo.companyName}.",
+  "expectedBenefits": "Concrete operational outcomes focusing on quantifiable KPI improvements.",
+  "why": "Sentence 1 explaining why the technology category addresses the core problem. Sentence 2 explaining why THEXRA suits ${clientInfo.companyName}.",
   "solutionArchitecture": {
     "solutionOverview": "Specific 1-sentence technical architecture overview tailored for ${clientInfo.companyName} in ${clientInfo.industry}.",
-    "userJourney": "${clientInfo.targetPersona} authenticates -> Scans workspace -> Executes digitized ${clientInfo.currentProcess} workflow -> Syncs real-time data.",
-    "hardware": ["Specific Hardware Model/Device tailored for ${clientInfo.companyName}"],
+    "userJourney": "Fluid active workflow step 1 -> Step 2 -> Step 3 -> Real-time telemetry sync.",
+    "hardware": ["Specific Hardware Model/Device tailored for ${clientInfo.industry}"],
     "software": ["THEXRA ${clientInfo.industry} Module"],
-    "aiComponents": ["Specific AI Automation Engine for ${clientInfo.problem}"],
+    "aiComponents": ["Domain-Specific AI Automation Engine"],
     "xrComponents": ["Custom Spatial UI for ${clientInfo.companyName}"],
     "backend": ["Enterprise Cloud Repository"],
     "dashboard": ["Real-time Operational Dashboard"],
@@ -467,10 +467,10 @@ CRITICAL FORMAT & GROUNDING RULES:
     { "stage": "Support", "duration": "Ongoing", "deliverables": ["SLA maintenance", "Monthly analytics report"] }
   ],
   "scopeOfWork": {
-    "projectScope": "Delivery of customized THEXRA platform to automate ${clientInfo.currentProcess} for ${clientInfo.companyName}.",
+    "projectScope": "Turnkey engineering deployment, integration, and validation of the customized THEXRA spatial platform for ${clientInfo.companyName}.",
     "features": ["Core Feature 1", "Core Feature 2"],
     "deliverables": ["Deliverable 1", "Deliverable 2"],
-    "hardware": ["Client-supplied enterprise devices"],
+    "hardware": ["Industry-standard spatial hardware devices"],
     "software": ["THEXRA Enterprise License"],
     "content": ["Customized UI Asset Pack"],
     "training": "1-Day Operational Workshop for ${clientInfo.targetPersona}",
@@ -861,8 +861,10 @@ CLIENT CONTEXT:
 
 CRITICAL INSTRUCTIONS:
 1. Write 2-3 concise, realistic sentences specifically tailored to "${sectionTitle}".
-2. Do NOT use generic templates. Address ${company}'s specific situation.
-3. Return raw plain text ONLY. Do NOT use markdown, JSON wrappers, or quotation marks.`;
+2. MANDATORY PARAPHRASING: Never copy raw input strings verbatim or wrap problem descriptions in literal quotation marks.
+3. FOR "Scope of Work": Must strictly use action-oriented execution verbs (e.g., "Deploy, configure, integrate, test, and deliver..."). Do NOT restate client challenges or problem descriptions.
+4. Do NOT use generic templates. Address ${company}'s specific situation directly.
+5. Return raw plain text ONLY. Do NOT use markdown, JSON wrappers, or quotation marks.`;
 
           // Call Gemini API directly for plain text generation
           const response = await ai.models.generateContent({

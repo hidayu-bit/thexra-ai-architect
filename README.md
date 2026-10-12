@@ -130,3 +130,10 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Print CSS Adjustments:** Applied `@media print` rules to hide UI buttons, clean up margins, and add basic page numbers.
 - **Diagram Tweaks:** Updated the 5-step flow diagram with clearer step colors and softer card borders.
 - **Format Review:** Checked exported documents to ensure they meet basic internal sales review standards.
+
+## Day 20 — Proposal QA Testing & Report
+- **10-Vertical Audit:** Executed end-to-end proposal generation across 10 industry verticals, acheiving 9 Primary LL successes nd 1 Fallback Mode execution.
+- **Prompt V2 Patch:** Updated script.js with prompt and sectionPrompt V2 rules to eliminate verbatim input copying, literal double quotes, and mechanical string concatenation..
+- **Quality Evaluation:** Evaluated proposal outputs across 6 core criteria - Relevance, Accuracy, Repitition, Hallucination, Professional Language, and Technical Feasibility.
+- **Re-Test Verification:** Verified the V2 patch via live re-testing on Case 01 (Precision Robotics Engineering), confirming clean corporate prose and active execution verbs.
+- **QA Documentation**: Compiled complete executive QA report featuring execution logs, deficiency/solution mappings, visual re-test evidence, and updated code artifacts.
