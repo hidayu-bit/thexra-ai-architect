@@ -137,3 +137,10 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Quality Evaluation:** Evaluated proposal outputs across 6 core criteria - Relevance, Accuracy, Repitition, Hallucination, Professional Language, and Technical Feasibility.
 - **Re-Test Verification:** Verified the V2 patch via live re-testing on Case 01 (Precision Robotics Engineering), confirming clean corporate prose and active execution verbs.
 - **QA Documentation**: Compiled complete executive QA report featuring execution logs, deficiency/solution mappings, visual re-test evidence, and updated code artifacts.
+
+## Day 21 — n8n Foundation & Backend Orhcestration
+- **Pipeline Architecture Integration:** Built and deployed the foundational n8n workflow connecting the Web App via Webhook, processing requirements through Google Gemini, and returning structured JSON payloads back to the frontend.
+- **Fault-Tolerant Error Handling:** Configured Gemini retry logic (3 attemps, 2000ms delay) and conditional if node branching for HTTP 200 success vs 500 error responses.
+- **Global Failure Monitoring Setup:** Built and linked a Global Error Handler workflow in primary settings to capture unhandled system exceptions.
+- **Execution Audit & Persistence:** Enabled production execution logging in n8n settings to store full payload data and execution runtimes for complete auditability.
+- **End-to-End Live Verification:** Verified live pipeline execution via DevTools Network logs (200 OK) and confirmed green execution status records in the n8n dashboard.
