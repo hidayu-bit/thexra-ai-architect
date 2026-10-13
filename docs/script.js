@@ -32,20 +32,16 @@ async function loadKnowledgeBases() {
 }
 loadKnowledgeBases();
 
-import { GoogleGenAI } from '@google/genai';
-
-const GEMINI_API_KEY = "GEMINIAPIKEY";
-const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+// Production Webhook Endpoint
+const N8N_WEBHOOK_URL = 'https://hidayu.app.n8n.cloud/webhook/generate-proposal';
 
 // Visual Architecture Flowchart Generator
 function renderArchitectureDiagram(architectureData, isProposal = false) {
   if (!architectureData) return '';
 
-  // Get current company/industry context from form if available
   const company = document.getElementById('company_name')?.value?.trim() || 'Client';
   const industry = document.getElementById('industryVertical')?.value?.trim() || 'Enterprise';
 
-  // Smart extractions with rich contextual defaults
   const hw = (architectureData.hardware || []).filter(Boolean).join(', ') || `${company} Workstations & Mobile Devices`;
   const xr = (architectureData.xrComponents || []).filter(Boolean).join(', ') || `Interactive ${industry} UI`;
   const sw = (architectureData.software || []).filter(Boolean).join(', ') || `THEXRA ${industry} Engine`;
@@ -245,43 +241,22 @@ function generateLocalFallbackData(clientInfo) {
   };
 }
 
-// Single-Model Helper locked to gemini-3.8-flash with JSON Enforcement & Exponential Backoff
-async function callGeminiWithRetry(prompt, maxRetries = 3, baseDelayMs = 2000) {
-  const modelName = 'gemini-3.8-flash';
+// n8n Webhook Pipeline Engine
+async function callGeminiWithRetry(prompt) {
+  const response = await fetch(N8N_WEBHOOK_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ prompt: prompt })
+  });
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      console.log(`Gemini API Call — Attempt ${attempt + 1} of ${maxRetries} using model: ${modelName}...`);
-
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json", // Mandates clean JSON output from Gemini
-          temperature: 0.2
-        }
-      });
-
-      return response; // Success!
-    } catch (err) {
-      console.warn(`Gemini API Attempt ${attempt + 1} (${modelName}) failed:`, err.message || err);
-
-      if (attempt === maxRetries - 1) {
-        throw new Error(`Gemini failed after ${maxRetries} attempts: ${err.message}`);
-      }
-
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      const delaySeconds = delay / 1000;
-
-      for (let sec = delaySeconds; sec > 0; sec--) {
-        if (statusBanner) {
-          statusBanner.className = 'status-banner loading';
-          statusBanner.innerText = `Gemini server busy. Retrying attempt ${attempt + 2}/${maxRetries} in ${sec}s...`;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-    }
+  if (!response.ok) {
+    throw new Error(`n8n HTTP error! Status: ${response.status}`);
   }
+
+  const data = await response.json();
+  return data;
 }
 
 // Automatically clear red error borders when user types
@@ -314,7 +289,6 @@ intakeForm?.addEventListener('submit', async (e) => {
     if (!firstErrorField) firstErrorField = element;
   };
 
-  // Helper to safely fetch elements by multiple potential IDs or Names
   const getEl = (...identifiers) => {
     for (const id of identifiers) {
       const el = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
@@ -365,7 +339,6 @@ intakeForm?.addEventListener('submit', async (e) => {
     markError(timelineSelect);
   }
 
-  // Halt execution if any required field is missing
   if (hasError) {
     if (statusBanner) {
       statusBanner.className = 'status-banner error';
@@ -375,10 +348,9 @@ intakeForm?.addEventListener('submit', async (e) => {
     if (firstErrorField) {
       firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    return; // STOP execution
+    return;
   }
 
-  // Build clientInfo mapping strictly to index.html IDs
   const clientInfo = {
     companyName: document.getElementById('company_name')?.value.trim() || 'N/A',
     industry: document.getElementById('industryVertical')?.value.trim() || 'N/A',
@@ -397,7 +369,7 @@ intakeForm?.addEventListener('submit', async (e) => {
 
   if (statusBanner) {
     statusBanner.className = 'status-banner loading';
-    statusBanner.innerText = 'Analyzing requirements with Gemini live AI...';
+    statusBanner.innerText = 'Analyzing requirements with n8n backend AI...';
   }
   if (submitBtn) {
     submitBtn.disabled = true;
@@ -481,21 +453,20 @@ CRITICAL FORMAT, PARAPHRASING & GROUNDING RULES:
   "recommendedNextStep": "Schedule a 30-minute technical scoping review for ${clientInfo.companyName}."
 }`;
 
-    const response = await callGeminiWithRetry(prompt, 3);
-    const rawText = response.text ? (typeof response.text === 'function' ? response.text() : response.text) : '';
-    data = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+    const rawResponse = await callGeminiWithRetry(prompt);
+    data = typeof rawResponse === 'string' ? JSON.parse(rawResponse.replace(/```json|```/g, "").trim()) : rawResponse;
 
     if (statusBanner) {
       statusBanner.className = 'status-banner success';
-      statusBanner.innerText = 'AI Brief Generated Successfully (Live Gemini)!';
+      statusBanner.innerText = 'AI Brief Generated Successfully (via n8n)!';
     }
   } catch (err) {
-    console.warn("Gemini API error or timeout. Falling back to Instant Engine:", err);
+    console.warn("n8n call failed or timed out. Switching to local instant mode:", err);
     data = generateLocalFallbackData(clientInfo);
 
     if (statusBanner) {
       statusBanner.className = 'status-banner success';
-      statusBanner.innerText = 'Brief Generated Successfully (Instant Mode)!';
+      statusBanner.innerText = 'Brief Generated Successfully (Instant Mode Fallback)!';
     }
   } finally {
     if (submitBtn) {
@@ -721,12 +692,11 @@ function openProposalEditor(data, clientInfo) {
     ? clientInfo.companyName
     : 'Client Organization';
 
-  // Dynamic header metadata calculations
   const companyInput = document.getElementById('company_name')?.value?.trim();
   const industryInput = document.getElementById('industryVertical')?.value?.trim();
   const clientName = companyInput || realCompany;
   const projectTitle = companyInput
-    ? `${companyInput} - ${industryInput || 'Enterprise'} Solution Proposal`
+    ? `${companyInput} ${industryInput || 'Enterprise'} Solution Proposal`
     : 'Enterprise Solution Proposal';
   const todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -748,7 +718,6 @@ function openProposalEditor(data, clientInfo) {
 
   function renderEditorSections() {
     content.innerHTML = `
-      <!-- 1. Executive Print Header (Injected upon opening modal) -->
       <div class="print-header-metadata" style="border-bottom: 2px solid #2563EB; padding-bottom: 12px; margin-bottom: 20px; font-family: Arial, sans-serif; width: 100%;">
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
               <tr>
@@ -772,7 +741,6 @@ function openProposalEditor(data, clientInfo) {
         </table>
       </div>
 
-      <!-- 2. Proposal Editor Controls -->
       <div style="display: flex; flex-direction: column; gap: 14px; text-align: left; font-family: inherit;">
         
         <div style="display: flex; justify-content: space-between; align-items: center; background: #F1F5F9; padding: 10px 12px; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
@@ -806,7 +774,6 @@ function openProposalEditor(data, clientInfo) {
       </div>
     `;
 
-    // Input change listeners
     document.querySelectorAll('.sec-title-input').forEach(input => {
       input.addEventListener('change', (e) => { sections[e.target.dataset.idx].title = e.target.value; });
     });
@@ -822,7 +789,7 @@ function openProposalEditor(data, clientInfo) {
       });
     });
 
-    // Real-time Async Section Regenerator with N/A Sanitization & Unique Fallbacks
+    // Real-time Async Section Regenerator
     document.querySelectorAll('.btn-regen-sec').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const idx = e.target.dataset.idx;
@@ -840,7 +807,6 @@ function openProposalEditor(data, clientInfo) {
           targetTextarea.style.background = '#F8FAFC';
         }
 
-        // Sanitize "N/A" values into professional context strings
         const company = (realCompany && realCompany !== 'N/A') ? realCompany : 'Client Organization';
         const industry = (clientInfo.industry && clientInfo.industry !== 'N/A') ? clientInfo.industry : 'Healthcare & Life Sciences';
         const problem = (clientInfo.problem && clientInfo.problem !== 'N/A') ? clientInfo.problem : 'high physical training costs and operational risks';
@@ -866,18 +832,8 @@ CRITICAL INSTRUCTIONS:
 4. Do NOT use generic templates. Address ${company}'s specific situation directly.
 5. Return raw plain text ONLY. Do NOT use markdown, JSON wrappers, or quotation marks.`;
 
-          // Call Gemini API directly for plain text generation
-          const response = await ai.models.generateContent({
-            model: 'gemini-3.8-flash',
-            contents: sectionPrompt,
-            config: { temperature: 0.4 }
-          });
-
-          let freshText = '';
-          if (response && response.text) {
-            freshText = typeof response.text === 'function' ? response.text() : response.text;
-          }
-
+          const rawResponse = await callGeminiWithRetry(sectionPrompt);
+          let freshText = typeof rawResponse === 'string' ? rawResponse : JSON.stringify(rawResponse);
           freshText = cleanText(freshText.replace(/```json|```/g, "").replace(/^["']|["']$/g, ""));
 
           if (freshText && freshText.length > 15) {
@@ -888,7 +844,6 @@ CRITICAL INSTRUCTIONS:
         } catch (err) {
           console.warn(`Section regeneration fallback triggered for "${sectionTitle}":`, err);
 
-          // Granular, section-specific fallbacks (Guarantees unique text across all 10 sections!)
           const titleLower = sectionTitle.toLowerCase();
 
           if (titleLower.includes('summary') || titleLower.includes('executive')) {
@@ -951,7 +906,6 @@ CRITICAL INSTRUCTIONS:
   renderEditorSections();
   modal.style.display = 'block';
 
-  // Direct print click handler with download popup notification
   document.addEventListener('click', (e) => {
     const isDownloadBtn = e.target.id === 'btn-modal-print' ||
       e.target.innerText?.includes('Export to PDF') ||
@@ -962,15 +916,13 @@ CRITICAL INSTRUCTIONS:
     e.preventDefault();
     e.stopPropagation();
 
-    // Listen for when the user completes or cancels the print/save dialog
     window.addEventListener('afterprint', () => {
-      // 1. Show alert popup
-      alert('Proposal export complete!\n\nIf you clicked Save, your PDF is now stored in your downloads folder.'
-      );
-    }, { once: true }); // { once: true } ensures the popup only triggers once per print
+      alert('Proposal export complete!\n\nIf you clicked Save, your PDF is now stored in your downloads folder.');
+    }, { once: true });
 
     window.print();
   });
+
   document.getElementById('btn-modal-close')?.addEventListener('click', () => {
     modal.style.display = 'none';
   });
