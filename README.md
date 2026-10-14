@@ -144,3 +144,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Global Failure Monitoring Setup:** Built and linked a Global Error Handler workflow in primary settings to capture unhandled system exceptions.
 - **Execution Audit & Persistence:** Enabled production execution logging in n8n settings to store full payload data and execution runtimes for complete auditability.
 - **End-to-End Live Verification:** Verified live pipeline execution via DevTools Network logs (200 OK) and confirmed green execution status records in the n8n dashboard.
+
+## Day 22 — Automated Lead Workflow
+- **Parallel Pipeline Branch:** Added a dedicated "Gemini Qualification" branch directly off the main Webhook without affecting the existing proposal generator.
+- **AI Lead Scoring:** Configured Gemini to evaluate client submissions (budget, timeline, scope) and classify them into **Hot**, **Warm**, or **Cold** tiers with a brief explanation.
+- **Automated Database Sync:** Connected a Google Sheets node ("THEXRA Lead Qualifications") to automatically log Company Name, Budget, Requirements, Lead Score, and Reason.
+- **Live Verification:** Tested end-to-end form submissions from the Web App, confirming real-time spreadsheet updates (e.g., $100k+ budget qualified as Hot).

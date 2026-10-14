@@ -703,7 +703,7 @@ function openProposalEditor(data, clientInfo) {
   const sections = [
     { title: "1. Executive Summary", text: `This executive proposal outlines the deployment of ${data.recommendedTechnology || 'THEXRA Spatial View'} for ${realCompany} to solve critical operational bottlenecks.` },
     { title: "2. Client Challenge", text: cleanText(data.businessProblem) },
-    { title: "3. Project Objectives", text: cleanText(data.clientObjective) },
+    { title: "3. Project Objectives", text: cleanText(data.clientObjective || data.expectedBenefits || `Deploy automated spatial AI solutions for ${realCompany} to optimize operational workflows.`) },
     { title: "4. Proposed Solution", text: cleanText(data.solutionConcept) },
     { title: "5. User Experience", text: `Intuitive spatial interface engineered specifically for ${cleanText(data.targetUsers)}, accelerating user onboarding and minimizing operational learning curves.` },
     { title: "6. Solution Architecture", text: cleanText(data.solutionArchitecture?.solutionOverview || 'Cloud-managed spatial edge architecture with secure API integration and real-time telemetry.') },
