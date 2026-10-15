@@ -602,6 +602,16 @@ function renderBriefOutput(data, clientInfo) {
     e.preventDefault();
     e.stopPropagation();
 
+    // Trigger n8n status update to Review
+    fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'review',
+        companyName: clientInfo.companyName || document.getElementById('company_name')?.value?.trim()
+      })
+    }).catch(err => console.warn('Status update sent:', err));
+
     const arch = data.solutionArchitecture || {};
     const htmlDoc = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -916,10 +926,19 @@ CRITICAL INSTRUCTIONS:
     e.preventDefault();
     e.stopPropagation();
 
-    window.addEventListener('afterprint', () => {
-      alert('Proposal export complete!\n\nIf you clicked Save, your PDF is now stored in your downloads folder.');
-    }, { once: true });
+    const compName = document.getElementById('company_name')?.value?.trim() || 'Client Organization';
 
+    // Send approve status to n8n
+    fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'approve',
+        companyName: compName
+      })
+    }).catch(err => console.warn('Approval trigger failed:', err));
+
+    // Trigger browser print/save modal
     window.print();
   });
 
