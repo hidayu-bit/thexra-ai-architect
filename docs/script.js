@@ -242,7 +242,12 @@ function generateLocalFallbackData(clientInfo) {
 }
 
 // n8n Webhook Pipeline Engine
-async function callGeminiWithRetry(prompt) {
+async function callGeminiWithRetry(prompt, action = null) {
+  const payload = { prompt: prompt };
+  if (action) {
+    payload.action = action;
+  }
+
   const response = await fetch(N8N_WEBHOOK_URL, {
     method: 'POST',
     headers: {
@@ -916,19 +921,25 @@ CRITICAL INSTRUCTIONS:
   renderEditorSections();
   modal.style.display = 'block';
 
+  let isApproving = false;
+
   document.addEventListener('click', (e) => {
     const isDownloadBtn = e.target.id === 'btn-modal-print' ||
       e.target.innerText?.includes('Export to PDF') ||
       e.target.closest('#btn-modal-print');
 
-    if (!isDownloadBtn) return;
+    if (!isDownloadBtn || isApproving) return;
 
     e.preventDefault();
     e.stopPropagation();
 
-    const compName = document.getElementById('company_name')?.value?.trim() || 'Client Organization';
+    isApproving = true; // Block duplicate triggers
 
-    // Send approve status to n8n
+    const compName = document.getElementById('company_name')?.value?.trim() ||
+      clientInfo?.companyName ||
+      'Client Organization';
+
+    // Send approve status to n8n once
     fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -936,10 +947,16 @@ CRITICAL INSTRUCTIONS:
         action: 'approve',
         companyName: compName
       })
-    }).catch(err => console.warn('Approval trigger failed:', err));
-
-    // Trigger browser print/save modal
-    window.print();
+    })
+      .then(() => {
+        window.print();
+        setTimeout(() => { isApproving = false; }, 2000); // Reset after 2 seconds
+      })
+      .catch(err => {
+        console.warn('Approval trigger failed:', err);
+        window.print();
+        isApproving = false;
+      });
   });
 
   document.getElementById('btn-modal-close')?.addEventListener('click', () => {
