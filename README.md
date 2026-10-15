@@ -150,3 +150,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **AI Lead Scoring:** Configured Gemini to evaluate client submissions (budget, timeline, scope) and classify them into **Hot**, **Warm**, or **Cold** tiers with a brief explanation.
 - **Automated Database Sync:** Connected a Google Sheets node ("THEXRA Lead Qualifications") to automatically log Company Name, Budget, Requirements, Lead Score, and Reason.
 - **Live Verification:** Tested end-to-end form submissions from the Web App, confirming real-time spreadsheet updates (e.g., $100k+ budget qualified as Hot).
+  
+## Day 23 — Automated Proposal Workflow
+- **Multi-Stage Lifecycle Tracking:** Built and automated status tracking system in n8n and Google Sheets ("THEXRA Lead Qualifications") to monitor proposal stages (`New` -> `Proposal Draft` -> `Review` -> `Approved`)
+- **Dynamic Switch Routing:** Configured an n8n Switch node to route execution paths based on frontend user actions (`review` vs `approve` vs initial form intake)
+- **Frontend Action Triggers:** Integrated `script.js` button handlers to dispatch real-time status updates when saving edits or exporting the final proposal to PDF
+- **Duplicate Prevention:** Optimized Switch rules to ensure secondary UI interactions update existing spreadsheet records instead of creating duplicate lead entries
