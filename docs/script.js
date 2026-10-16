@@ -158,6 +158,17 @@ const intakeForm = document.getElementById('intake-form');
 const statusBanner = document.getElementById('form-status');
 const briefOutput = document.getElementById('aiOutput');
 
+// Read URL query parameters on page load
+const urlParams = new URLSearchParams(window.location.search);
+const companyFromUrl = urlParams.get('company');
+
+if (companyFromUrl) {
+  const companyInput = document.getElementById('company_name');
+  if (companyInput) {
+    companyInput.value = companyFromUrl;
+  }
+}
+
 // Dynamic High-Quality Local Fallback Engine
 function generateLocalFallbackData(clientInfo) {
   const comp = clientInfo.companyName !== 'N/A' ? clientInfo.companyName : 'Client Organization';
