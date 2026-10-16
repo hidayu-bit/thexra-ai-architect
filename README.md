@@ -156,3 +156,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Dynamic Switch Routing:** Configured an n8n Switch node to route execution paths based on frontend user actions (`review` vs `approve` vs initial form intake)
 - **Frontend Action Triggers:** Integrated `script.js` button handlers to dispatch real-time status updates when saving edits or exporting the final proposal to PDF
 - **Duplicate Prevention:** Optimized Switch rules to ensure secondary UI interactions update existing spreadsheet records instead of creating duplicate lead entries
+
+## Day 24 — Notification Automation
+- **Automated Internal Alert Engine:** Configured an n8n notification pipeline using Gmail to dispatch instant executive lead alerts upon solution proposal creation
+- **Dynamic 13-Section Proposal Generation:** Integrated a Google Drive (`Create file from text`) node to convert AI outputs into structured `.txt` proposal files stored directly in cloud storage.
+- **Multi-Field Notification Template:** Formatted HTML internal email notifications to deliver all 5 essential fields (Client Name, Core Opportunity, Recommended Solution, Lead Score, and direct Proposal Link)
+- **Cross-Branch Expression Safety:** Optimized n8n expression mappings using `$(`Webhook`)` and `$(`Gemini Qualification D22`)` to prevent cross-branch references and ensure 100% reliable payload execution.
