@@ -317,6 +317,12 @@ intakeForm?.addEventListener('submit', async (e) => {
     return null;
   };
 
+  // Work Email *
+  const emailInput = getEl('clientEmail', 'workEmail', 'email');
+  if (!emailInput || !emailInput.value.trim() || !emailInput.value.includes('@')) {
+    markError(emailInput);
+  }
+
   // 1. Company Name *
   const companyInput = getEl('companyName', 'company_name', 'clientCompany');
   if (!companyInput || !companyInput.value.trim()) markError(companyInput);
@@ -339,13 +345,17 @@ intakeForm?.addEventListener('submit', async (e) => {
   const problemInput = getEl('problem', 'coreProblem', 'businessProblem', 'frictionPoints');
   if (!problemInput || !problemInput.value.trim()) markError(problemInput);
 
-  // 5. Target End-Users *
-  const targetUsersInput = getEl('targetEndUsers', 'targetUser', 'target_end_users', 'endUsers');
-  if (!targetUsersInput || !targetUsersInput.value.trim()) markError(targetUsersInput);
+  // Target End-Users *
+  const targetUsersInput = getEl('end_users', 'targetEndUsers', 'targetUser');
+  if (!targetUsersInput || !targetUsersInput.value.trim()) {
+    markError(targetUsersInput);
+  }
 
-  // 6. Desired Business Outcome / KPIs *
-  const outcomeInput = getEl('desiredOutcome', 'kpis', 'businessOutcome', 'desired_outcome');
-  if (!outcomeInput || !outcomeInput.value.trim()) markError(outcomeInput);
+  // Desired Business Outcome / KPIs *
+  const outcomeInput = getEl('outcomes', 'desiredOutcome', 'kpis');
+  if (!outcomeInput || !outcomeInput.value.trim()) {
+    markError(outcomeInput);
+  }
 
   // 7. Estimated Budget Range *
   const budgetSelect = getEl('budgetRange', 'estimatedBudget', 'budget_range', 'budget');
