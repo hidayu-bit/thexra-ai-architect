@@ -162,3 +162,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Dynamic 13-Section Proposal Generation:** Integrated a Google Drive (`Create file from text`) node to convert AI outputs into structured `.txt` proposal files stored directly in cloud storage.
 - **Multi-Field Notification Template:** Formatted HTML internal email notifications to deliver all 5 essential fields (Client Name, Core Opportunity, Recommended Solution, Lead Score, and direct Proposal Link)
 - **Cross-Branch Expression Safety:** Optimized n8n expression mappings using `$(`Webhook`)` and `$(`Gemini Qualification D22`)` to prevent cross-branch references and ensure 100% reliable payload execution.
+
+## Day 25 — Follow-Up Automation
+- **Automated Delay Pipeline:** Configured an n8n `Wait` node to introduce scheduled evalution intervals following initial proposal dispatch.
+- **Real-Time CRM Status Check:** Integrated a Google Sheets `Get row(s)` node to fetch the up-to-date lifecycle status (`Proposal Draft`, `Review`, or `Append`) in Column F before taking action.
+- **Conditional Cancellation Logic:** Built an `If` condition node to evaluate proposal status, automatically terminating the branch if marked `Approved` via UI PDF Export.
+- **Internal Reminder Dispatch:** Configured a secondary Gmail notification node on the unaproved branch to alert internal teams when proposals remain pending review.
