@@ -264,7 +264,11 @@ async function callGeminiWithRetry(prompt, action = null) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ prompt: prompt })
+    body: JSON.stringify({
+      prompt: prompt,
+      clientEmail: document.getElementById('clientEmail')?.value?.trim() || '',
+      companyName: document.getElementById('company_name')?.value?.trim() || ''
+    })
   });
 
   if (!response.ok) {
@@ -368,6 +372,7 @@ intakeForm?.addEventListener('submit', async (e) => {
   }
 
   const clientInfo = {
+    clientEmail: document.getElementById('clientEmail')?.value.trim() || 'N/A',
     companyName: document.getElementById('company_name')?.value.trim() || 'N/A',
     industry: document.getElementById('industryVertical')?.value.trim() || 'N/A',
     location: document.getElementById('location')?.value.trim() || 'N/A',
@@ -624,7 +629,8 @@ function renderBriefOutput(data, clientInfo) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'review',
-        companyName: clientInfo.companyName || document.getElementById('company_name')?.value?.trim()
+        companyName: clientInfo.companyName || document.getElementById('company_name')?.value?.trim(),
+        clientEmail: document.getElementById('clientEmail')?.value?.trim() || ''
       })
     }).catch(err => console.warn('Status update sent:', err));
 
@@ -956,7 +962,8 @@ CRITICAL INSTRUCTIONS:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'approve',
-        companyName: compName
+        companyName: compName,
+        clientEmail: document.getElementById('clientEmail')?.value?.trim() || ''
       })
     })
       .then(() => {
