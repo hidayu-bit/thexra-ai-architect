@@ -168,3 +168,9 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Real-Time CRM Status Check:** Integrated a Google Sheets `Get row(s)` node to fetch the up-to-date lifecycle status (`Proposal Draft`, `Review`, or `Append`) in Column F before taking action.
 - **Conditional Cancellation Logic:** Built an `If` condition node to evaluate proposal status, automatically terminating the branch if marked `Approved` via UI PDF Export.
 - **Internal Reminder Dispatch:** Configured a secondary Gmail notification node on the unaproved branch to alert internal teams when proposals remain pending review.
+
+## Day 26 — Sales Dashboard
+- **Dedicated Admin Portal Interface:** Developed a high-performance standalone Sales Dashboard (`admin.html`) featuring a glassmorphism theme to protect client privacy without touching core intake form logic[cite: 28, 29].
+- **Real-Time CRM Synchronization:** Connected a dynamic JavaScript data parser (`admin.js`) fetching lead records directly from the Google Sheets CRM endpoint via live CSV stream.
+- **Operational Metric Cards:** Built real-time summary indicators tracking total inquiries, hot lead counts, and pending review statuses.
+- **Interactive Action Triggers:** Implemented direct proposal document opening and interactive record deletion/archiving capabilities[cite: 28, 29].
