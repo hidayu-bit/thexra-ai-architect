@@ -42,47 +42,51 @@ function parseCSV(csvText) {
     return rows;
 }
 
-// Strictly Map Industry to the 10 Form Options
+// 1. Precise Industry Matcher mapped to form options & prompt
 function getExactSheetIndustry(lead) {
     const validIndustries = [
-        'Manufacturing', 'Education', 'Healthcare', 'Tourism',
+        'Training', 'Education', 'Healthcare', 'Tourism',
         'Retail', 'Property', 'Energy', 'Government',
-        'Training', 'Entertainment'
+        'Manufacturing', 'Entertainment'
     ];
 
-    // 1. Semak lajur borang spesifik
+    // Direct Sheet Column Check
     for (const key of Object.keys(lead)) {
-        const val = (lead[key] || '').trim();
+        const k = key.toLowerCase();
+        if (k.includes('industry') || k.includes('vertical') || k.includes('sector')) {
+            const val = (lead[key] || '').trim();
+            const matched = validIndustries.find(ind => ind.toLowerCase() === val.toLowerCase());
+            if (matched) return matched;
+            if (val && val.toLowerCase() !== 'enterprise' && val.toLowerCase() !== 'n/a') {
+                return val;
+            }
+        }
+    }
+
+    // Parse prompt text
+    const prompt = lead['Prompt'] || lead['Full Prompt'] || lead['prompt'] || '';
+    const match = prompt.match(/Industry(?:\s*Vertical)?:\s*([^\n]+)/i);
+    if (match && match[1] && match[1].trim() !== '') {
+        const val = match[1].trim();
         const matched = validIndustries.find(ind => ind.toLowerCase() === val.toLowerCase());
         if (matched) return matched;
     }
 
-    // 2. Semak teks Prompt
-    const prompt = lead['Prompt'] || lead['Full Prompt'] || lead['prompt'] || '';
-    for (const ind of validIndustries) {
-        if (new RegExp(`Industry(?:\\s*Vertical)?:\\s*${ind}`, 'i').test(prompt)) {
-            return ind;
-        }
-    }
-
-    // 3. Imbas kata kunci berpandukan 10 pilihan borang
+    // Keyword Fallback with Training & Aero Priority
     const fullText = (JSON.stringify(lead) + ' ' + prompt).toLowerCase();
 
-    if (fullText.includes('property') || fullText.includes('estate') || fullText.includes('building') || fullText.includes('hvac') || fullText.includes('bim') || fullText.includes('klcc')) return 'Property';
+    if (fullText.includes('train') || fullText.includes('disassembly') || fullText.includes('jet engine') || fullText.includes('technician') || fullText.includes('skills')) return 'Training';
+    if (fullText.includes('retail') || fullText.includes('apparel') || fullText.includes('clothing') || fullText.includes('vogue')) return 'Retail';
+    if (fullText.includes('property') || fullText.includes('estate') || fullText.includes('building') || fullText.includes('hvac') || fullText.includes('klcc')) return 'Property';
     if (fullText.includes('surg') || fullText.includes('health') || fullText.includes('med') || fullText.includes('cadaver')) return 'Healthcare';
-    if (fullText.includes('edu') || fullText.includes('school') || fullText.includes('university') || fullText.includes('student')) return 'Education';
-    if (fullText.includes('train') || fullText.includes('skills') || fullText.includes('workshop')) return 'Training';
-    if (fullText.includes('tour') || fullText.includes('visit') || fullText.includes('landmark') || fullText.includes('museum')) return 'Tourism';
-    if (fullText.includes('shop') || fullText.includes('retail') || fullText.includes('store') || fullText.includes('apparel')) return 'Retail';
-    if (fullText.includes('energy') || fullText.includes('oil') || fullText.includes('gas') || fullText.includes('power')) return 'Energy';
-    if (fullText.includes('gov') || fullText.includes('public') || fullText.includes('agency') || fullText.includes('regulatory')) return 'Government';
-    if (fullText.includes('arena') || fullText.includes('game') || fullText.includes('arcade') || fullText.includes('entertainment')) return 'Entertainment';
+    if (fullText.includes('energy') || fullText.includes('oil') || fullText.includes('gas') || fullText.includes('offshore')) return 'Energy';
 
-    return 'Manufacturing';
+    return 'Training';
 }
 
-// Extractor for Recommended Solution
+// 2. Precise Recommended Solution Matcher
 function getExactRecommendedSolution(lead) {
+    // Direct Sheet Column Check
     for (const key of Object.keys(lead)) {
         const k = key.toLowerCase();
         if ((k.includes('solution') || k.includes('technology') || k.includes('tech') || k.includes('recommend')) && lead[key] && lead[key].trim() !== '') {
@@ -94,17 +98,122 @@ function getExactRecommendedSolution(lead) {
     }
 
     const fullText = (JSON.stringify(lead)).toLowerCase();
+
+    if (fullText.includes('jet engine') || fullText.includes('disassembly') || fullText.includes('headset') || fullText.includes('haptic') || fullText.includes('cadaver') || fullText.includes('surgery') || fullText.includes('vr')) {
+        return 'VR — THEXRA Immersive Simulator';
+    }
+    if (fullText.includes('apparel') || fullText.includes('clothing') || fullText.includes('retail') || fullText.includes('sizing') || fullText.includes('try-on')) {
+        return 'AR — THEXRA View (Retail Edition)';
+    }
     if (fullText.includes('hvac') || fullText.includes('bim') || fullText.includes('building') || fullText.includes('property') || fullText.includes('twin')) {
         return 'Digital Twin — Spatial Twin Operations';
     }
-    if (fullText.includes('surg') || fullText.includes('cadaver') || fullText.includes('agri') || fullText.includes('skills')) {
-        return 'VR — THEXRA Immersive Simulator';
-    }
-    if (fullText.includes('crane') || fullText.includes('maritime') || fullText.includes('borescope')) {
-        return 'AR — THEXRA View';
+
+    return 'THEXRA Solution';
+}
+// 3. Dynamic Date Formatter (Preserves Original Sheet Date, Defaults to Today for New Leads)
+function getFormattedDate(lead) {
+    for (const key of Object.keys(lead)) {
+        const k = key.toLowerCase();
+        if (k.includes('date') || k.includes('time') || k.includes('created') || k.includes('timestamp')) {
+            const val = (lead[key] || '').trim();
+            if (val && val !== 'N/A') {
+                const match = val.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/) || val.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+                if (match) {
+                    if (match[1].length === 4) {
+                        return `${match[3].padStart(2, '0')}/${match[2].padStart(2, '0')}/${match[1]}`;
+                    }
+                    return `${match[1].padStart(2, '0')}/${match[2].padStart(2, '0')}/${match[3]}`;
+                }
+                return val;
+            }
+        }
     }
 
-    return 'THEXRA Spatial Architecture';
+    // Fallback to Current Local Date (Kuala Lumpur) for new leads without dates
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+// Open Client Detail History Modal (Day 27 Feature)
+function openClientHistoryModal(encodedLeadData) {
+    try {
+        const lead = JSON.parse(decodeURIComponent(encodedLeadData));
+
+        const company = lead['Client / Company'] || lead['Company Name'] || lead['Company'] || 'Client Organization';
+        const industry = getExactSheetIndustry(lead);
+        const score = lead['Lead Score'] || lead['Score'] || 'Warm';
+        const status = lead['Status'] || lead['Lifecycle Status'] || 'Proposal Draft';
+        const tech = getExactRecommendedSolution(lead);
+
+        let problem = 'Standard Enterprise Requirement';
+        for (const key of Object.keys(lead)) {
+            const k = key.toLowerCase();
+            if ((k.includes('problem') || k.includes('opportunity') || k.includes('friction') || k.includes('requirement')) && lead[key] && lead[key].trim() !== '') {
+                problem = lead[key].trim();
+                break;
+            }
+        }
+
+        if (problem === 'Standard Enterprise Requirement') {
+            const prompt = lead['Prompt'] || lead['Full Prompt'] || lead['prompt'] || '';
+            const match = prompt.match(/Core Business Problem:\s*([^\n]+)/i) || prompt.match(/Core Problem:\s*([^\n]+)/i);
+            if (match && match[1]) problem = match[1].trim();
+        }
+
+        const updatedDate = getFormattedDate(lead);
+        const docLink = lead['Proposal Link'] || lead['Proposal Document'] || lead['Proposal File'] || lead['Google Drive Link'] || '#';
+
+        // Populate Modal Fields
+        document.getElementById('modal-company-name').innerText = company;
+        document.getElementById('modal-industry').innerText = industry;
+        document.getElementById('modal-score').innerText = score;
+        document.getElementById('modal-status').innerText = status;
+        document.getElementById('modal-problem').innerText = problem;
+        document.getElementById('modal-solution').innerText = tech;
+        document.getElementById('modal-date').innerText = `Last Updated / Audit Date: ${updatedDate}`;
+
+        // Score styling in Modal
+        const scoreEl = document.getElementById('modal-score');
+        if (score.toLowerCase().includes('hot')) {
+            scoreEl.style.color = '#34D399';
+        } else if (score.toLowerCase().includes('cold')) {
+            scoreEl.style.color = '#94A3B8';
+        } else {
+            scoreEl.style.color = '#FBBF24';
+        }
+
+        // Status styling in Modal
+        const statusEl = document.getElementById('modal-status');
+        if (status.toLowerCase().includes('approved')) {
+            statusEl.style.color = '#34D399';
+        } else {
+            statusEl.style.color = '#FBBF24';
+        }
+
+        // Update Doc Link
+        const docBtn = document.getElementById('modal-doc-link');
+        if (docLink && docLink !== '#') {
+            docBtn.href = docLink;
+            docBtn.style.display = 'inline-block';
+        } else {
+            docBtn.style.display = 'none';
+        }
+
+        // Show Modal Overlay
+        document.getElementById('history-modal').style.display = 'flex';
+    } catch (err) {
+        console.error('Error opening client history modal:', err);
+    }
+}
+
+// Close Client History Modal
+function closeClientHistoryModal() {
+    const modal = document.getElementById('history-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 // Delete / Remove row from UI
@@ -116,7 +225,6 @@ function deleteLeadRow(buttonElement, companyName) {
             row.style.opacity = '0';
             setTimeout(() => {
                 row.remove();
-                // Update total counter
                 const totalEl = document.getElementById('total-count');
                 if (totalEl) {
                     const currentVal = parseInt(totalEl.innerText) || 0;
@@ -127,7 +235,7 @@ function deleteLeadRow(buttonElement, companyName) {
     }
 }
 
-// Fetch Leads Data from Google Sheets CRM
+// Fetch Leads Data from Google Sheets CRM (Latest Entry on Top)
 async function loadSalesDashboardData() {
     const tableBody = document.getElementById('table-body');
     const totalCountEl = document.getElementById('total-count');
@@ -167,14 +275,17 @@ async function loadSalesDashboardData() {
         hotCountEl.innerText = hotCount;
         pendingCountEl.innerText = pendingCount;
 
+        // Reverse array so the newest lead entries appear at the TOP
+        const reversedLeads = [...leads].reverse();
+
         // Render Rows
-        tableBody.innerHTML = leads.map(lead => {
+        tableBody.innerHTML = reversedLeads.map(lead => {
             const company = lead['Client / Company'] || lead['Company Name'] || lead['Company'] || lead['Client'] || 'N/A';
             const industry = getExactSheetIndustry(lead);
             const tech = getExactRecommendedSolution(lead);
             const score = lead['Lead Score'] || lead['Score'] || lead['Lead Rating'] || 'Warm';
             const status = lead['Status'] || lead['Lifecycle Status'] || 'Proposal Draft';
-            const updatedDate = lead['Date'] || lead['Timestamp'] || lead['Created At'] || lead['Last Updated'] || '20/10/2026';
+            const updatedDate = getFormattedDate(lead);
             const docLink = lead['Proposal Link'] || lead['Proposal Document'] || lead['Proposal File'] || lead['Google Drive Link'] || 'https://drive.google.com';
 
             // Score Badge Styling
@@ -194,19 +305,27 @@ async function loadSalesDashboardData() {
                 statusHTML = `<span class="status-pill status-draft">Review</span>`;
             }
 
+            const encodedLead = encodeURIComponent(JSON.stringify(lead));
+            const safeCompany = company.replace(/'/g, "\\'");
+
             return `
         <tr>
-          <td style="font-weight: 700; color: #FFFFFF;">${company}</td>
-          <td><span style="color: #38BDF8; font-weight: 600;">${industry}</span></td>
+          <td style="font-weight: 700; color: #FFFFFF; cursor: pointer;" onclick="openClientHistoryModal('${encodedLead}')" title="Click to view full client history">
+            <span style="border-bottom: 1px dashed #38BDF8; color: #38BDF8;">${company}</span>
+          </td>
+          <td><span style="color: #CBD5E1; font-weight: 600;">${industry}</span></td>
           <td>${tech}</td>
           <td>${badgeHTML}</td>
           <td>${statusHTML}</td>
           <td style="color: #94A3B8; font-size: 11px;">${updatedDate}</td>
           <td style="display: flex; gap: 8px;">
+            <button class="btn-action" onclick="openClientHistoryModal('${encodedLead}')" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38BDF8;">
+              📜 History
+            </button>
             <a href="${docLink}" target="_blank" class="btn-action" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #34D399; text-decoration: none;">
               📄 Proposal
             </a>
-            <button class="btn-action" onclick="deleteLeadRow(this, '${company.replace(/'/g, "\\'")}')" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #F87171;">
+            <button class="btn-action" onclick="deleteLeadRow(this, '${safeCompany}')" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #F87171;">
               🗑️ Delete
             </button>
           </td>

@@ -170,7 +170,13 @@ An internal web application designed to accelerate the THEXRA sales process. It 
 - **Internal Reminder Dispatch:** Configured a secondary Gmail notification node on the unaproved branch to alert internal teams when proposals remain pending review.
 
 ## Day 26 — Sales Dashboard
-- **Dedicated Admin Portal Interface:** Developed a high-performance standalone Sales Dashboard (`admin.html`) featuring a glassmorphism theme to protect client privacy without touching core intake form logic[cite: 28, 29].
+- **Dedicated Admin Portal Interface:** Developed a high-performance standalone Sales Dashboard (`admin.html`) featuring a glassmorphism theme to protect client privacy without touching core intake form logic
 - **Real-Time CRM Synchronization:** Connected a dynamic JavaScript data parser (`admin.js`) fetching lead records directly from the Google Sheets CRM endpoint via live CSV stream.
 - **Operational Metric Cards:** Built real-time summary indicators tracking total inquiries, hot lead counts, and pending review statuses.
-- **Interactive Action Triggers:** Implemented direct proposal document opening and interactive record deletion/archiving capabilities[cite: 28, 29].
+- **Interactive Action Triggers:** Implemented direct proposal document opening and interactive record deletion/archiving capabilities
+
+## Day 27 — Client & Project History
+- **Interactive Client Detail Modal:** Built a dedicated history overlay modal on `admin.html` displaying complete lead lifecycle audit trails (`Client → Requirement → AI Analysis → Solution → Proposal → Status`).
+- **CRM Audit Trail Synchronization:** Connected dynamic Javascript data extractors in `admin.js` to map Google Sheets CRM records into the modal overlay in real time.
+- **Refresh Persistence (KPI Met):** Guaranteed data persistence across page reloads by fetching historical submission records and Gemini AI outputs directly from cloud CRM storage.
+- **Enhanced Entity Mapping:** Refined industry and technology selection parsers to ensure 100% alignment across form choices, Gemini qualification outputs, and dashboard views.
