@@ -1,0 +1,341 @@
+{
+  "name": "THEXRA AI Solution Architect",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-proposal",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aaf41446-93d3-4311-ac30-f957d037e81f",
+      "name": "Webhook",
+      "webhookId": "3896ceb8-f4bd-4fac-8cc6-1471a987fd14"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.parse($json.content.parts[0].text.replace(/```json|```/g, '').trim()) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        976,
+        112
+      ],
+      "id": "e4d4f07b-c413-45df-9b5f-accbd6da26bb",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "852543ae-952b-48ba-a53a-7c48f9791548",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "Exists",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        0
+      ],
+      "id": "0d0bcfcc-f8d2-4a01-ad6e-d1695e2bcc2c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"error\": \"AI Generation Failed\" }",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        944,
+        -80
+      ],
+      "id": "8a1ad2ec-5f3b-48b0-b716-dff19be7e071",
+      "name": "Respond to Webhook 2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.8-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.8-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI Lead Qualification assistant. Analyze the incoming client submission below and categorize the lead quality.\n\nCLIENT INTAKE DATA:\n{{ JSON.stringify($json.body) }}\n\nQUALIFICATION RULES BASED ON BUDGET & SCOPE:\n- Hot: $100k+ budget bracket, or clear high-intent technical AI requirements.\n- Warm: $50k–$100k budget bracket, standard timeline, solid enterprise fit.\n- Cold: $10k–$50k budget bracket, missing details, vague requirements, or poor fit for custom software.\n\nReturn ONLY a raw, valid JSON object with NO markdown code wrappers (no ```json):\n{\n  \"leadScore\": \"Hot, Warm, or Cold\",\n  \"reason\": \"1 to 2 sentence clear executive explanation justifying the score.\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        -240
+      ],
+      "id": "14505c16-e01f-45d1-bce5-1a19d8b67725",
+      "name": "Gemini Qualification D22",
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3.8-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.body.prompt }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        80
+      ],
+      "id": "ef2d8070-1ad7-4bb0-a1ff-80ae9285541c",
+      "name": "Message a model D21",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1AFjgWSm9TTcuXzT9Eo9qrADEGhzGY_9zIb22A-acuJU",
+          "mode": "list",
+          "cachedResultName": "THEXRXA Lead Qualifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AFjgWSm9TTcuXzT9Eo9qrADEGhzGY_9zIb22A-acuJU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AFjgWSm9TTcuXzT9Eo9qrADEGhzGY_9zIb22A-acuJU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client / Company": "={{ $('Webhook').item.json.body.prompt.match(/Company Name:\\s*([^\\n]+)/)?.[1]?.trim() || \"N/A\" }}",
+            "Budget": "={{ $('Webhook').item.json.body.prompt.match(/Budget Range:\\s*([^\\n]+)/)?.[1]?.trim() || \"N/A\" }}",
+            "Requirements": "={{ $('Webhook').item.json.body.prompt.match(/Core Business Problem:\\s*([^\\n]+)/)?.[1]?.trim() || \"N/A\" }}",
+            "Lead Score": "={{ JSON.parse($json.content.parts[0].text.replace(/```json|```/g, '').trim()).leadScore }}",
+            "Reason": "={{ JSON.parse($json.content.parts[0].text.replace(/```json|```/g, '').trim()).reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Client / Company",
+              "displayName": "Client / Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Requirements",
+              "displayName": "Requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        -240
+      ],
+      "id": "aefb9f18-d442-41ea-9804-f59a3278c7c7",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5hzxmBcuKNcpJYd3",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Gemini Qualification D22",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model D21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Qualification D22": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model D21": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataErrorExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveDataSuccessExecution": "all",
+    "errorWorkflow": "kpi6zZ9wJ9YXDYry"
+  },
+  "versionId": "63a0f591-095d-4a1e-95c0-140e9c78b58c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae54b20ddf4855a178d8b868afcb4a59397f8917b710d1473d8c12d161ba37cb"
+  },
+  "nodeGroups": [],
+  "id": "UJ3YmrPkV09lSRwo",
+  "tags": []
+}
