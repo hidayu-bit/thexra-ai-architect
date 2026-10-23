@@ -4,29 +4,35 @@ An enterprise-grade, AI-driven proposal generation engine and sales management p
 
 ---
 
-## 1. Live URLs & Deployment
-- **Intake Form (Live Production):** `https://hidayu-bit.github.io/thexra-ai-architect/wireframe.html`
-- **Sales Operations Dashboard:** `https://hidayu-bit.github.io/thexra-ai-architect/admin.html`
-- **GitHub Repository:** `https://github.com/hidayu-bit/thexra-ai-architect`
+## 1. Live Access & System Portals
+Click the links below to access the live system components directly:
+
+- 📝 **Client Intake Form (Public):** [https://hidayu-bit.github.io/thexra-ai-architect/wireframe.html](https://hidayu-bit.github.io/thexra-ai-architect/wireframe.html)
+  *(Use this link to submit client requirements and trigger AI generation)*
+
+- 📊 **Sales Operations Dashboard (Admin):** [https://hidayu-bit.github.io/thexra-ai-architect/admin.html](https://hidayu-bit.github.io/thexra-ai-architect/admin.html)
+  *(Use this link to view real-time CRM leads and proposal recommendations)*
+
+- 📁 **GitHub Repository:** [https://github.com/hidayu-bit/thexra-ai-architect](https://github.com/hidayu-bit/thexra-ai-architect)
 
 ---
 
-## 2. System Architecture
+## 2. System Architecture Diagram
 [ Client / User ]
-│ (HTTP Submit)
-▼
+│
+▼ (1. Submit Form)
 [ Enterprise Intake Form (wireframe.html) ]
 │
-▼ (Webhook POST / JSON Payload)
+▼ (2. Webhook POST / JSON Payload)
 [ n8n Automation Engine ]
-├──► [ Gemini AI Engine (Prompt Structuring & Solution Scoping) ]
-└──► [ Google Sheets CRM (Live Database Sync) ]
+├──────────► [ Gemini AI Engine (Prompt Structuring & Scoping) ]
+└──────────► [ Google Sheets CRM (Database Sync) ]
 │
-▼ (GViz CSV Fetch / REST)
+▼ (3. GViz Real-Time Fetch)
 [ Sales Dashboard (admin.html) ]
 │
-▼ (Interactive Overlay)
-[ Client Lifecycle History Modal ]
+▼ (4. Click Lead Row)
+[ Client History Modal ]
 
 ---
 
