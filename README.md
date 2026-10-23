@@ -21,21 +21,24 @@ Click the links below to access the live system components directly:
 ---
 
 ## 2. System Architecture Diagram
+
+```
 [ Client / User ]
-│
-▼ (1. Submit Form)
+       │
+       ▼ (1. Submit Form)
 [ Enterprise Intake Form (wireframe.html) ]
-│
-▼ (2. Webhook POST / JSON Payload)
+       │
+       ▼ (2. Webhook POST / JSON Payload)
 [ n8n Automation Engine ]
-├──────────► [ Gemini AI Engine (Prompt Structuring & Scoping) ]
-└──────────► [ Google Sheets CRM (Database Sync) ]
-│
-▼ (3. GViz Real-Time Fetch)
-[ Sales Dashboard (admin.html) ]
-│
-▼ (4. Click Lead Row)
-[ Client History Modal ]
+       ├──────────► [ Gemini AI Engine (Prompt Structuring & Scoping) ]
+       └──────────► [ Google Sheets CRM (Database Sync) ]
+                          │
+                          ▼ (3. GViz Real-Time Fetch)
+                   [ Sales Dashboard (admin.html) ]
+                          │
+                          ▼ (4. Click Lead Row)
+                   [ Client History Modal ]
+```
 ---
 
 ## 3. Gemini Configuration & AI Engine
