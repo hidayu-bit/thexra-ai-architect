@@ -30,20 +30,37 @@ An enterprise-grade, AI-driven proposal generation engine and sales management p
 
 ---
 
-## 3. Environment Variables & Credentials Configuration
+## 3. Gemini Configuration & AI Engine
 
-Configure the following environment variables inside your n8n workspace / deployment environment:
+- **Model:** Gemini 1.5 Flash / Gemini 2.0 Flash
+- **Task:** Automated Qualification & Solution Scoping
+- **Temperature / Parameters:** Optimized for structured JSON extraction and technical proposal generation.
+- **Prompt Strategy:** Processes client budget, spatial requirements, and operational timeline into tailored technology stacks and pricing estimates.
+
+---
+
+## 4. n8n Workflow Documentation
+
+- **Trigger:** Webhook Node (Listens for POST submissions from `wireframe.html`).
+- **Data Transformation:** Formats incoming form payloads for Gemini AI processing.
+- **AI Processing Node:** Calls Google Gemini API to structure solution recommendations.
+- **Database Action:** Appends raw client submission & AI response to Google Sheets CRM via Google Sheets API.
+- **Output Action:** Returns confirmation status payload to client UI.
+
+---
+
+## 5. Environment Variables & Credentials Configuration
 
 | Variable Name            | Description                                                                    | Target Service                |
 | :----------------------- | :----------------------------------------------------------------------------- | :---------------------------- |
-| `GEMINI_API_KEY`         | Google Gemini AI Studio API Key for qualification prompts                      | Gemini 1.5 / 2.0 Flash API    |
+| `GEMINI_API_KEY`         | Google Gemini AI Studio API Key for qualification prompts                      | Gemini API                    |
 | `N8N_WEBHOOK_URL`        | Production Webhook endpoint listening for form submissions                     | n8n Webhook Node              |
 | `GOOGLE_SHEET_ID`        | Google Sheets CRM document ID (`1AFjgWSm9TTcuXzT9Eo9qrADEGhzGY_9zIb22A-acuJU`) | Google Sheets Node / GViz API |
 | `GOOGLE_DRIVE_FOLDER_ID` | Target folder ID storing generated proposal PDFs                               | Google Drive API              |
 
 ---
 
-## 4. Setup & Local Installation Instructions
+## 6. Setup & Local Installation Instructions
 
 ### Prerequisites
 - Web Browser (Google Chrome / Microsoft Edge)
