@@ -5,9 +5,9 @@ An enterprise-grade, AI-driven proposal generation engine and sales management p
 ---
 
 ## 1. Live URLs & Deployment
-* **Intake Form (Live Production):** `https://hidayu-bit.github.io/thexra-ai-architect/docs/wireframe.html`
-* **Sales Operations Dashboard:** `https://hidayu-bit.github.io/thexra-ai-architect/docs/admin.html`
-* **GitHub Repository:** `https://github.com/hidayu-bit/thexra-ai-architect`
+- **Intake Form (Live Production):** `https://hidayu-bit.github.io/thexra-ai-architect/wireframe.html`
+- **Sales Operations Dashboard:** `https://hidayu-bit.github.io/thexra-ai-architect/admin.html`
+- **GitHub Repository:** `https://github.com/hidayu-bit/thexra-ai-architect`
 
 ---
 
@@ -46,9 +46,9 @@ Configure the following environment variables inside your n8n workspace / deploy
 ## 4. Setup & Local Installation Instructions
 
 ### Prerequisites
-* Web Browser (Google Chrome / Microsoft Edge)
-* Local Web Server (VS Code Live Server or python `-m http.server 5500`)
-* Active n8n Instance (Cloud or Docker)
+- Web Browser (Google Chrome / Microsoft Edge)
+- Local Web Server (VS Code Live Server or Python `-m http.server 5500`)
+- Active n8n Instance (Cloud or Docker)
 
 ### Installation Steps
 1. **Clone Repository:**
