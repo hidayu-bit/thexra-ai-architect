@@ -8,12 +8,15 @@ An enterprise-grade, AI-driven proposal generation engine and sales management p
 Click the links below to access the live system components directly:
 
 - 📝 **Client Intake Form (Public):** [https://hidayu-bit.github.io/thexra-ai-architect/wireframe.html](https://hidayu-bit.github.io/thexra-ai-architect/wireframe.html)
-  *(Use this link to submit client requirements and trigger AI generation)*
+  *(Use this link to submit client requirements and trigger AI generation)*[cite: 7, 9, 12]
 
 - 📊 **Sales Operations Dashboard (Admin):** [https://hidayu-bit.github.io/thexra-ai-architect/admin.html](https://hidayu-bit.github.io/thexra-ai-architect/admin.html)
-  *(Use this link to view real-time CRM leads and proposal recommendations)*
+  *(Use this link to view real-time CRM leads and proposal recommendations)*[cite: 7, 9, 12]
 
-- 📁 **GitHub Repository:** [https://github.com/hidayu-bit/thexra-ai-architect](https://github.com/hidayu-bit/thexra-ai-architect)
+- 🟢 **Google Sheets CRM Database (Backend):** [https://docs.google.com/spreadsheets/d/1AFjgWSm9TTcuXzT9Eo9qrADEGhzGY_9zIb22A-acuJU/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1AFjgWSm9TTcuXzT9Eo9qrADEGhzGY_9zIb22A-acuJU/edit?usp=sharing)
+  *(Backend spreadsheet storing incoming JSON payloads and Gemini AI analysis)*[cite: 7, 9]
+
+- 📁 **GitHub Repository:** [https://github.com/hidayu-bit/thexra-ai-architect](https://github.com/hidayu-bit/thexra-ai-architect)[cite: 7, 9]
 
 ---
 
@@ -33,7 +36,6 @@ Click the links below to access the live system components directly:
 │
 ▼ (4. Click Lead Row)
 [ Client History Modal ]
-
 ---
 
 ## 3. Gemini Configuration & AI Engine
