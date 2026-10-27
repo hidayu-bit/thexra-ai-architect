@@ -33,7 +33,7 @@ async function loadKnowledgeBases() {
 loadKnowledgeBases();
 
 // Production Webhook Endpoint
-const N8N_WEBHOOK_URL = 'https://hidayu.app.n8n.cloud/webhook/generate-proposal';
+const N8N_WEBHOOK_URL = 'https://dyu.app.n8n.cloud/webhook/generate-proposal';
 
 // Visual Architecture Flowchart Generator
 function renderArchitectureDiagram(architectureData, isProposal = false) {
